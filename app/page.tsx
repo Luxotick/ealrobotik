@@ -177,7 +177,6 @@ export default function HomePage() {
           <li><strong>Okul:</strong> Eskişehir Anadolu Lisesi</li>
           <li><strong>FRC Takım:</strong> 8828</li>
         </ul>
-        <p className="text-xs text-muted-foreground">Veriler resmi FRC kaynakları ve kamusal beyanlardan derlenmiştir.</p>
       </section>
       <DevSignature />
       {/* Made with ❤️ by @luxotick on GitHub */}
