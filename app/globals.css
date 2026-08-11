@@ -127,6 +127,18 @@ section[id] { scroll-margin-top: 6rem; }
 /* Gradient metin yardımcıları */
 .gradient-text { background: linear-gradient(90deg,hsl(var(--primary)),hsl(216.9 33.3% 22.9%)); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
+/* Sponsor logo filtreleri */
+.sponsor-black { filter: brightness(0); }
+:is(.dark) .sponsor-black { filter: none; }
+.sponsor-white { filter: none; }
+:is(.dark) .sponsor-white { filter: brightness(0) invert(1); }
+
+/* Tema bazlı logo değişimi */
+.theme-light-only { display: block; }
+:is(.dark) .theme-light-only { display: none; }
+.theme-dark-only { display: none; }
+:is(.dark) .theme-dark-only { display: block; }
+
 /* Scrollbar minimal (Webkit) */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }

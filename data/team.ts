@@ -1,5 +1,18 @@
 export const vision = `FRC aracılığı ile yarışmalara katılarak teknoloji alanında lider projelere katkıda bulunmak, takımca mekanik ve programlama alanlarında ilerleme kaydederek kendimizi geleceğe hazırlamaktır.`
 
+import eskisehirLogo from '@/assets/eskisehir.webp'
+import mezunlarLogo from '@/assets/mezunlar.webp'
+import evrenayLogo from '@/assets/evrenay.webp'
+import tgdLogo from '@/assets/tgd makine.webp'
+import solidworksLogo from '@/assets/solidworks.webp'
+import ikizlerLogo from '@/assets/ikizler.webp'
+import fikretyukselLogo from '@/assets/fikretyuksel.webp'
+import boeingLogo from '@/assets/boeing.webp'
+import baranisikLogo from '@/assets/baranisik.webp'
+import baranisikDarkLogo from '@/assets/baranisik_dark.webp'
+import ealLogo from '@/assets/eal.webp'
+import korelLogo from '@/assets/korel.webp'
+
 export const mission = `Teknolojinin hayatımızın her alanına girdiği şu günlerde teknolojik gelişmelere katkı sağlayacak gençleri destekleyen bir yarışın parçası olmak, şehrimizi ve ülkemizi en iyi şekilde temsil etmektir. Hem takım hem de bireysel anlamda edindiğimiz bilgi ve tecrübeleri ülkemizin geleceği olan çocuklara aktarmak, onlara rol model olmaktır.`
 
 export interface SeasonPerformance {
@@ -48,15 +61,46 @@ export const performances: SeasonPerformance[] = [
   }
 ]
 
+export interface Sponsor {
+  name: string
+  logo?: string
+  logoLight?: string
+  logoClass?: string
+}
+
 export interface SponsorGroup {
   group: string
-  sponsors: string[]
+  sponsors: Sponsor[]
 }
 
 export const sponsors: SponsorGroup[] = [
-  { group: 'Kurumlar', sponsors: ['Eskişehir İl Milli Eğitim Müdürlüğü', 'Eskişehir Anadolu Lisesi'] },
-  { group: 'Mezun & Dernek', sponsors: ['Eskişehir Anadolu Lisesi Mezunlar Derneği', 'EAL 98 Mezunları'] },
-  { group: 'Özel Sektör', sponsors: ['Evrenay İnşaat', 'Crede Danışmanlık & Veri Hizmetleri', 'TGD Konveyör Sistemleri & Üretim Hatları', 'Selka Prefabrik', 'KOREL Elektronik'] }
+  {
+    group: 'Kurumlar',
+    sponsors: [
+      { name: 'Eskişehir İl Milli Eğitim Müdürlüğü', logo: eskisehirLogo.src },
+      { name: 'Eskişehir Anadolu Lisesi', logo: ealLogo.src },
+      { name: 'Fikret Yüksel Vakfı', logo: fikretyukselLogo.src }
+    ]
+  },
+  {
+    group: 'Mezun & Dernek',
+    sponsors: [
+      { name: 'Eskişehir Anadolu Lisesi Mezunlar Derneği', logo: mezunlarLogo.src },
+      { name: 'EAL 98 Mezunları', logo: mezunlarLogo.src }
+    ]
+  },
+  {
+    group: 'Özel Sektör',
+    sponsors: [
+      { name: 'Evrenay İnşaat', logo: evrenayLogo.src, logoClass: 'sponsor-black' },
+      { name: 'TGD Konveyör Sistemleri & Üretim Hatları', logo: tgdLogo.src },
+      { name: 'KOREL Elektronik', logo: korelLogo.src, logoClass: 'sponsor-white' },
+      { name: 'SolidWorks Corp.', logo: solidworksLogo.src },
+      { name: 'İkizler Mantı ve Börek', logo: ikizlerLogo.src },
+      { name: 'Boeing Corp.', logo: boeingLogo.src, logoClass: 'sponsor-black' },
+      { name: 'Baran Işık', logo: baranisikLogo.src, logoLight: baranisikDarkLogo.src }
+    ]
+  }
 ]
 
 export interface Source { title: string; url: string }

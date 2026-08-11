@@ -3,13 +3,19 @@ import { Highlights } from '@/components/sections/highlights'
 import { Timeline } from '@/components/sections/timeline'
 import { SponsorMarquee } from '@/components/sections/sponsor-marquee'
 import { Wave } from '@/components/ui/wave'
-import { mission, vision, performances, sponsors, sources, trainingLinks, type SeasonPerformance, type SponsorGroup, type TrainingLink, type Source } from '@/data/team'
+import { mission, vision, performances, sponsors, sources, trainingLinks, type SeasonPerformance, type SponsorGroup, type Sponsor, type TrainingLink, type Source } from '@/data/team'
 import { DevSignature } from '@/components/signature'
 
 export default function HomePage() {
   return (
     <div className="space-y-28">
-      <div id="hero"><Hero /></div>
+      <div className="space-y-8 md:space-y-10">
+        <div id="hero"><Hero /></div>
+        <section className="space-y-4 md:-mx-4">
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground text-center fade-in-up" style={{ animationDelay: '0.4s' }}>Sponsorlar</h3>
+          <SponsorMarquee />
+        </section>
+      </div>
       <section id="hakkinda" className="space-y-12 scroll-mt-24">
         <div className="max-w-4xl mx-auto text-center space-y-4">
           <h2 className="text-3xl font-bold tracking-tight">Hakkında</h2>
@@ -68,15 +74,9 @@ export default function HomePage() {
           <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-14 md:h-20 bg-gradient-to-t from-background/85 via-background/35 to-transparent backdrop-blur-[3px] z-[5]" />
           <Wave />
         </div>
-        <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
-          <div className="space-y-4 min-w-0">
-            <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Zaman Çizelgesi</h3>
-            <Timeline />
-          </div>
-          <div className="space-y-4 min-w-0">
-            <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Sponsorlar</h3>
-            <SponsorMarquee />
-          </div>
+        <div className="max-w-5xl mx-auto space-y-4">
+          <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Zaman Çizelgesi</h3>
+          <Timeline />
         </div>
       </section>
       <section id="ekosistem" className="space-y-8 scroll-mt-24 max-w-5xl mx-auto">
@@ -89,7 +89,9 @@ export default function HomePage() {
             <div key={group.group} className="relative overflow-hidden rounded-lg border p-4 glass-panel">
               <h4 className="font-semibold mb-2 text-xs tracking-wide uppercase text-muted-foreground">{group.group}</h4>
               <ul className="space-y-1 text-sm relative z-10">
-                {group.sponsors.map((s: string) => <li key={s}>{s}</li>)}
+                {group.sponsors.map((s: Sponsor) => (
+                  <li key={s.name}>{s.name}</li>
+                ))}
               </ul>
               <Wave />
             </div>
