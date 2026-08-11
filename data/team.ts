@@ -36,6 +36,15 @@ export const performances: SeasonPerformance[] = [
     playoff: 'Çeyrek Finalist',
     alliancePick: '2. tur seçimi (7. ittifak)',
     notes: 'Stratejik niş değeri yüksek, erken tur seçimi.'
+  },
+  {
+    season: 2026,
+    game: 'REBUILT',
+    ranking: { rank: 21, total: 33 },
+    record: { wins: 4, losses: 9, ties: 0 },
+    playoff: '2. Turda Elendi (Çifte Eliminasyon)',
+    alliancePick: '1. tur seçimi (5. İttifak)',
+    notes: '5. İttifakın 1. seçimi olarak playofflara katıldı, ancak çifte eliminasyon tablosunda 2. turda elendi.'
   }
 ]
 

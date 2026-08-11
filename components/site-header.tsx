@@ -86,7 +86,7 @@ export function SiteHeader() {
               >
                 {item.label}
                 {isActive && (
-                  <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded bg-primary" />
+                  <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded bg-highlight" />
                 )}
               </Link>
             )

@@ -1,4 +1,4 @@
-const YEAR = 2025 // Sabitlenmiş yıl – hydration farklılığı riskini azaltır.
+const YEAR = 2026 // Sabitlenmiş yıl – hydration farklılığı riskini azaltır.
 
 export function SiteFooter() {
   return (

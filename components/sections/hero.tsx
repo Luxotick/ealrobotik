@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 
 const stats = [
   { label: 'Kuruluş', value: '2021' },
-  { label: 'Play-off Görünümü', value: '3' },
+  { label: 'Play-off Görünümü', value: '4' },
   { label: 'FRC Takım', value: '8828' }
 ]
 
@@ -50,7 +50,7 @@ export function Hero() {
       >
         {stats.map(s => (
           <div key={s.label} className="px-4 py-2 rounded-full glass text-sm flex items-center gap-2">
-            <span className="font-semibold">{s.value}</span>
+            <span className="font-semibold text-highlight">{s.value}</span>
             <span className="text-muted-foreground text-xs uppercase tracking-wide">{s.label}</span>
           </div>
         ))}

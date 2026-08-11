@@ -10,16 +10,20 @@
   body {
     font-family: var(--font-sans);
     background:
+      linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px),
       radial-gradient(circle at 20% 20%, hsl(var(--primary)/0.08), transparent 70%),
       radial-gradient(circle at 80% 50%, hsl(var(--accent)/0.06), transparent 75%),
       linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)) 80%);
+    background-size: 36px 36px, 36px 36px, auto, auto, auto;
     background-attachment: fixed;
   }
 }
 
 :root {
-  --background: 0 0% 100%;
+  --background: 220 14% 96.5%;
   --foreground: 222.2 84% 4.9%;
+  --grid-line: hsl(222.2 84% 4.9% / 0.1);
 
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
@@ -30,21 +34,23 @@
   --primary: 221 83% 53%;
   --primary-foreground: 210 40% 98%;
 
-  --secondary: 210 40% 99.5%;
+  --secondary: 220 14% 94%;
   --secondary-foreground: 222.2 47.4% 11.2%;
 
-  --muted: 210 40% 99.5%;
+  --muted: 220 14% 93.5%;
   --muted-foreground: 215.4 16.3% 46.9%;
 
-  --accent: 210 40% 99.5%;
+  --accent: 220 14% 93%;
   --accent-foreground: 222.2 47.4% 11.2%;
 
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
 
-  --border: 214.3 31.8% 97%;
-  --input: 214.3 31.8% 97%;
+  --border: 220 13% 89%;
+  --input: 220 13% 89%;
   --ring: 221 83% 53%;
+
+  --highlight: 191 83% 75%;
 
   --radius: 0.75rem;
 }
@@ -52,6 +58,7 @@
 .dark {
   --background: 222.2 84% 4.9%;
   --foreground: 210 40% 100%;
+  --grid-line: hsl(0 0% 100% / 0.05);
 
   --card: 222.2 84% 4.9%;
   --card-foreground: 210 40% 100%;
@@ -77,9 +84,10 @@
   --border: 217.2 32.6% 25%;
   --input: 217.2 32.6% 25%;
   --ring: 224.3 76.3% 48%;
+
+  --highlight: 191 83% 70%;
 }
 
-html, body { height: 100%; }
 body { background-color: hsl(var(--background)); color: hsl(var(--foreground)); font-feature-settings: "rlig" 1, "calt" 1; }
 
 html { scroll-behavior: smooth; }
@@ -107,8 +115,17 @@ section[id] { scroll-margin-top: 6rem; }
 @keyframes fade-in-up { from { opacity:0; transform: translateY(12px);} to { opacity:1; transform: translateY(0);} }
 .fade-in-up { animation: fade-in-up .6s cubic-bezier(.16,.8,.31,1) both; }
 
+/* Dalga animasyonlari - seamless loop */
+@keyframes wave-drift-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes wave-drift-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+.wave-track-back { animation: wave-drift-left 24s linear infinite; }
+.wave-track-front { animation: wave-drift-right 16s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .wave-track-back, .wave-track-front { animation: none; }
+}
+
 /* Gradient metin yardımcıları */
-.gradient-text { background: linear-gradient(90deg,hsl(var(--primary)),hsl(var(--accent))); -webkit-background-clip:text; background-clip:text; color:transparent; }
+.gradient-text { background: linear-gradient(90deg,hsl(var(--primary)),hsl(216.9 33.3% 22.9%)); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
 /* Scrollbar minimal (Webkit) */
 ::-webkit-scrollbar { width: 10px; }

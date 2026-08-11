@@ -11,7 +11,7 @@ const milestones = [
 export function Timeline() {
   return (
     <div className="relative pl-6">
-      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-primary/40 via-border to-accent/40" />
+      <div className="absolute left-2 top-0 bottom-0 w-px bg-gradient-to-b from-highlight/60 via-border to-highlight/40" />
       <ul className="space-y-8">
         {milestones.map((m, i) => (
           <motion.li
@@ -22,8 +22,8 @@ export function Timeline() {
             transition={{ delay: i * 0.08, duration: 0.5 }}
             className="relative"
           >
-            <div className="absolute -left-[34px] mt-1 w-4 h-4 rounded-full bg-gradient-to-tr from-primary to-accent shadow ring-2 ring-background" />
-            <div className="text-sm text-muted-foreground">{m.year}</div>
+            <div className="absolute -left-[34px] mt-1 w-4 h-4 rounded-full bg-gradient-to-tr from-primary to-highlight shadow ring-2 ring-background" />
+            <div className="text-sm text-highlight font-medium">{m.year}</div>
             <h3 className="font-semibold leading-tight">{m.title}</h3>
             <p className="text-sm text-muted-foreground mt-1 max-w-prose">{m.desc}</p>
           </motion.li>
