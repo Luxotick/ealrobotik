@@ -12,9 +12,6 @@ const stats = [
 export function Hero() {
   return (
     <section className="relative text-center space-y-10 py-8 md:py-14">
-      <div className="absolute inset-0 -z-10 overflow-hidden pointer-events-none">
-        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] bg-gradient-to-tr from-primary/15 via-primary/0 to-accent/10 rounded-full blur-3xl" />
-      </div>
       <motion.h1
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

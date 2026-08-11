@@ -64,11 +64,11 @@ export default function HomePage() {
           </table>
         </div>
         <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-12">
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Zaman Çizelgesi</h3>
             <Timeline />
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 min-w-0">
             <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Sponsorlar</h3>
             <SponsorMarquee />
           </div>
