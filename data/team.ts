@@ -70,20 +70,17 @@ export const sources: Source[] = [
 export interface TrainingLink { title: string; url: string; category: 'software' | 'mechanical' | 'document' }
 
 export const trainingLinks: TrainingLink[] = [
-  // Software
   { title: 'WPILib Docs', url: 'https://docs.wpilib.org/en/stable/', category: 'software' },
   { title: 'WPILib VSCode Installer (Windows)', url: 'https://packages.wpilib.workers.dev/installer/v2024.3.2/Win64/WPILib_Windows-2024.3.2.iso', category: 'software' },
   { title: 'GitHub', url: 'https://github.com/', category: 'software' },
   { title: 'GitHub Student Pack', url: 'https://education.github.com/pack', category: 'software' },
   { title: 'ChiefDelphi Forum', url: 'https://www.chiefdelphi.com/', category: 'software' },
   { title: 'FRC Java Programming Tutorial Playlist', url: 'https://www.youtube.com/watch?v=PdgXk6D311k&list=PLC3-At2hTK9hVPv623YealxDAHim6FdJQ', category: 'software' },
-  // Mechanical
   { title: 'Fusion 360', url: 'https://www.autodesk.com/', category: 'mechanical' },
   { title: 'Fusion 360 Education Pack', url: 'https://www.autodesk.com/education/edu-software/overview', category: 'mechanical' },
   { title: 'Fusion 360 Kurulum & Eğitim Videosu', url: 'https://www.youtube.com/watch?v=ufBiBPoZJuI', category: 'mechanical' },
   { title: 'Fusion Eğitimleri Playlist', url: 'https://www.youtube.com/playlist?list=PL2hEqvQGoz6tvtmszZASqKR_OjwL1hdL_', category: 'mechanical' },
   { title: 'İleri Teknik Fusion Eğitimleri', url: 'https://www.youtube.com/playlist?list=PL0fZjEQc8oaMEkOGcNvueT8lAZvcoKuie', category: 'mechanical' },
   { title: 'ChiefDelphi (Mekanik Referans)', url: 'https://www.chiefdelphi.com/', category: 'mechanical' },
-  // Documents
   { title: 'Roboting - A Guide for New Teams (PDF)', url: 'https://ealrobotik.com/sources/Roboting-A-Guide-for-New-Teams.pdf', category: 'document' }
 ]

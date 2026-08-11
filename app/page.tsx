@@ -102,12 +102,9 @@ export default function HomePage() {
           <p className="text-sm text-muted-foreground">Teknik öğrenmeyi destekleyen temel araç seti.</p>
         </div>
 
-        {/* Dallanma çizgileri (küt/çubuk sonlandırmalı ağaç diyagramı) */}
         <div className="hidden md:block relative w-full h-10 my-2" aria-hidden="true">
-          {/* Üst gövde */}
           <div className="absolute top-0 left-1/2 -ml-[1px] w-[2px] h-3 bg-highlight/70" />
           
-          {/* Yatay dal çizgisi */}
           <div 
             className="absolute top-3 h-[2px] bg-highlight/70"
             style={{
@@ -116,16 +113,13 @@ export default function HomePage() {
             }}
           />
 
-          {/* Sol dikey iniş (Yazılım) */}
           <div 
             className="absolute top-3 w-[2px] h-7 bg-highlight/70 -ml-[1px]"
             style={{ left: 'calc(100% / 6 - 0.6667rem)' }}
           />
 
-          {/* Orta dikey iniş (Mekanik) */}
           <div className="absolute top-3 left-1/2 -ml-[1px] w-[2px] h-7 bg-highlight/70" />
 
-          {/* Sağ dikey iniş (Eğitim) */}
           <div 
             className="absolute top-3 w-[2px] h-7 bg-highlight/70 -ml-[1px]"
             style={{ left: 'calc(100% * 5 / 6 + 0.6667rem)' }}
@@ -167,12 +161,9 @@ export default function HomePage() {
           <p className="text-sm text-muted-foreground">Programımız öğrenme kültürünü sistematik kaynaklarla destekler: Yazılım ve mekanik alanlarında küratörlü linkler.</p>
         </div>
 
-        {/* Dallanma çizgileri (Eğitimler ağaç diyagramı) */}
         <div className="hidden md:block relative w-full h-10 my-2" aria-hidden="true">
-          {/* Üst gövde */}
           <div className="absolute top-0 left-1/2 -ml-[1px] w-[2px] h-3 bg-highlight/70" />
           
-          {/* Yatay dal çizgisi */}
           <div 
             className="absolute top-3 h-[2px] bg-highlight/70"
             style={{
@@ -181,16 +172,13 @@ export default function HomePage() {
             }}
           />
 
-          {/* Sol dikey iniş (Yazılım Eğitimleri) */}
           <div 
             className="absolute top-3 w-[2px] h-7 bg-highlight/70 -ml-[1px]"
             style={{ left: 'calc(100% / 6 - 0.6667rem)' }}
           />
 
-          {/* Orta dikey iniş (Mekanik Eğitimleri) */}
           <div className="absolute top-3 left-1/2 -ml-[1px] w-[2px] h-7 bg-highlight/70" />
 
-          {/* Sağ dikey iniş (Dokümanlar) */}
           <div 
             className="absolute top-3 w-[2px] h-7 bg-highlight/70 -ml-[1px]"
             style={{ left: 'calc(100% * 5 / 6 + 0.6667rem)' }}
@@ -248,7 +236,6 @@ export default function HomePage() {
         </ul>
       </section>
       <DevSignature />
-      {/* Made with ❤️ by @luxotick on GitHub */}
     </div>
   )
 }

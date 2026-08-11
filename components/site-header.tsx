@@ -8,7 +8,6 @@ interface NavItem {
   label: string
 }
 
-// Tek sayfa içi anchor navigasyon yapısı.
 const nav: readonly NavItem[] = [
   { href: '#hero', label: 'Ana Sayfa' },
   { href: '#hakkinda', label: 'Hakkında' },
