@@ -234,6 +234,7 @@ export default function HomePage() {
         <ul className="space-y-2 text-sm">
           <li><strong className="text-highlight">E-posta:</strong> <a className="text-primary hover:underline" href="mailto:info@ealrobotik.com">info@ealrobotik.com</a></li>
           <li><strong className="text-highlight">Okul:</strong> Eskişehir Anadolu Lisesi</li>
+          <li><strong className="text-highlight">Instagram Adresi:</strong> <a className="text-primary hover:underline" href="https://www.instagram.com/ealrobotik_8828?igsh=cTI0cGMxZWpydGc1" target="_blank" rel="noopener noreferrer">@ealrobotik_8828</a></li>
           <li><strong className="text-highlight">FRC Takım:</strong> 8828</li>
         </ul>
       </section>
