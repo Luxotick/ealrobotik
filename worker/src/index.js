@@ -90,6 +90,7 @@ const MAX_PAGE_CHARS = 8000
 const MAX_PAGE_BYTES = 5 * 1024 * 1024
 const UPSTREAM_TIMEOUT_MS = 30000
 const STREAM_TIMEOUT_MS = 120000
+const RACE_BATCH_SIZE = 3
 
 function sanitizeMessages(messages) {
   const out = []
@@ -280,7 +281,7 @@ function parseSearchResults(html) {
   return results
 }
 
-async function callUpstream(body, env, ip, timeoutMs = UPSTREAM_TIMEOUT_MS) {
+async function callUpstream(body, env, ip, signal) {
   return fetch(UPSTREAM_URL, {
     method: 'POST',
     headers: {
@@ -290,7 +291,7 @@ async function callUpstream(body, env, ip, timeoutMs = UPSTREAM_TIMEOUT_MS) {
       'x-real-ip': ip
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(timeoutMs)
+    signal
   })
 }
 
@@ -385,25 +386,10 @@ export default {
 }
 
 async function chatLoop(messages, maxTokens, env, ip) {
-  const routes = [(body) => callUpstream(body, env, ip)]
-  if (env.GOOGLE_API_KEY) {
-    for (const model of GEMINI_FALLBACK_MODELS) {
-      routes.push((body) => callGemini(body, env, model))
-    }
-  }
-  let lastErr = null
-  for (const route of routes) {
-    try {
-      return await runLoop(messages, maxTokens, env, route)
-    } catch (err) {
-      lastErr = err
-      console.error('route_failed', err.message.slice(0, 200))
-    }
-  }
-  throw lastErr || new Error('no_route_available')
+  return runLoop(messages, maxTokens, env, buildRoutes(env, ip))
 }
 
-async function runLoop(messages, maxTokens, env, route) {
+async function runLoop(messages, maxTokens, env, routes) {
   let responseData = null
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
     const body = {
@@ -417,16 +403,12 @@ async function runLoop(messages, maxTokens, env, route) {
     }
     if (env.THINKING !== 'off') body.reasoning_effort = 'medium'
 
-    const upstream = await route(body)
-    if (!upstream.ok) {
-      const detail = await upstream.text().catch(() => '')
-      console.error('upstream_status', upstream.status)
-      throw new Error('upstream_status_' + upstream.status + '_' + detail.slice(0, 200))
-    }
+    const winner = await raceBatches(routes, body, UPSTREAM_TIMEOUT_MS)
+    if (!winner) throw new Error('upstream_all_failed')
 
     let parsed
     try {
-      parsed = await upstream.json()
+      parsed = await winner.res.json()
     } catch {
       throw new Error('upstream_invalid_response')
     }
@@ -454,7 +436,7 @@ async function runLoop(messages, maxTokens, env, route) {
   return responseData
 }
 
-async function callGemini(body, env, model, timeoutMs = UPSTREAM_TIMEOUT_MS) {
+async function callGemini(body, env, model, signal) {
   return fetch(GEMINI_URL, {
     method: 'POST',
     headers: {
@@ -462,8 +444,60 @@ async function callGemini(body, env, model, timeoutMs = UPSTREAM_TIMEOUT_MS) {
       Authorization: `Bearer ${env.GOOGLE_API_KEY}`
     },
     body: JSON.stringify({ ...body, model }),
-    signal: AbortSignal.timeout(timeoutMs)
+    signal
   })
+}
+
+function buildRoutes(env, ip) {
+  const routes = [(body, signal) => callUpstream(body, env, ip, signal)]
+  if (env.GOOGLE_API_KEY) {
+    for (const model of GEMINI_FALLBACK_MODELS) {
+      routes.push((body, signal) => callGemini(body, env, model, signal))
+    }
+  }
+  return routes
+}
+
+function chunks(arr, size) {
+  const out = []
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size))
+  return out
+}
+
+async function raceBatch(batch, body, timeoutMs) {
+  const inflight = []
+  let resolveWinner = null
+  const winnerPromise = new Promise(resolve => {
+    resolveWinner = resolve
+  })
+  for (const route of batch) {
+    const ac = new AbortController()
+    const timer = setTimeout(() => ac.abort(), timeoutMs)
+    const p = (async () => {
+      try {
+        const res = await route(body, ac.signal)
+        if (res.ok) resolveWinner({ res, ac })
+      } catch {}
+    })()
+    inflight.push({ p, ac, timer })
+  }
+  const result = await Promise.race([
+    winnerPromise,
+    Promise.all(inflight.map(x => x.p)).then(() => null)
+  ])
+  for (const { ac, timer } of inflight) {
+    clearTimeout(timer)
+    if (!result || ac !== result.ac) ac.abort()
+  }
+  return result
+}
+
+async function raceBatches(routes, body, timeoutMs) {
+  for (const batch of chunks(routes, RACE_BATCH_SIZE)) {
+    const winner = await raceBatch(batch, body, timeoutMs)
+    if (winner) return winner
+  }
+  return null
 }
 
 function runLoopStream(messages, maxTokens, env, ip) {
@@ -474,27 +508,12 @@ function runLoopStream(messages, maxTokens, env, ip) {
           controller.enqueue(new TextEncoder().encode('data: ' + JSON.stringify(obj) + '\n\n'))
         } catch {}
       }
-      const routes = [(body, t) => callUpstream(body, env, ip, t)]
-      if (env.GOOGLE_API_KEY) {
-        for (const model of GEMINI_FALLBACK_MODELS) {
-          routes.push((body, t) => callGemini(body, env, model, t))
-        }
+      try {
+        await streamRounds(messages, maxTokens, env, buildRoutes(env, ip), emit)
+      } catch (err) {
+        console.error('stream_all_failed', err.message.slice(0, 200))
+        emit({ type: 'error', message: (err.message || 'no_route').slice(0, 200) })
       }
-
-      let lastErr = null
-      for (const route of routes) {
-        try {
-          await streamRounds(messages, maxTokens, env, route, emit)
-          try {
-            controller.close()
-          } catch {}
-          return
-        } catch (err) {
-          lastErr = err
-          console.error('stream_route_failed', err.message.slice(0, 200))
-        }
-      }
-      emit({ type: 'error', message: (lastErr?.message || 'no_route').slice(0, 200) })
       try {
         controller.close()
       } catch {}
@@ -502,7 +521,7 @@ function runLoopStream(messages, maxTokens, env, ip) {
   })
 }
 
-async function streamRounds(messages, maxTokens, env, route, emit) {
+async function streamRounds(messages, maxTokens, env, routes, emit) {
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
     emit({ type: 'thinking' })
     const body = {
@@ -516,14 +535,19 @@ async function streamRounds(messages, maxTokens, env, route, emit) {
     }
     if (env.THINKING !== 'off') body.reasoning_effort = 'medium'
 
-    const upstream = await route(body, STREAM_TIMEOUT_MS)
-    if (!upstream.ok) {
-      const detail = await upstream.text().catch(() => '')
-      console.error('upstream_status', upstream.status)
-      throw new Error('upstream_status_' + upstream.status + '_' + detail.slice(0, 200))
-    }
+    const winner = await raceBatches(routes, body, STREAM_TIMEOUT_MS)
+    if (!winner) throw new Error('upstream_all_failed')
 
-    const { content, toolCalls } = await readStream(upstream, emit)
+    const readTimer = setTimeout(() => winner.ac.abort(), STREAM_TIMEOUT_MS)
+    let content = ''
+    let toolCalls = []
+    try {
+      const result = await readStream(winner.res, emit)
+      content = result.content
+      toolCalls = result.toolCalls
+    } finally {
+      clearTimeout(readTimer)
+    }
     if (!toolCalls.length) {
       emit({ type: 'done' })
       return

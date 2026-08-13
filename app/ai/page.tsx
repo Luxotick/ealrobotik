@@ -27,6 +27,15 @@ const replies: Array<[RegExp, string | ((input: string, ...args: string[]) => st
 
 const fallback = 'Bu konuda sana en iyi nasıl yardımcı olabileceğimi düşünüyorum. Takım, eğitimler veya performans hakkında sorabilirsin. Detaylı bilgi için ana sayfaya veya Instagram hesabımıza göz atabilirsin.'
 
+const THINKING_MESSAGES = [
+  'düşünüyorum...',
+  'doğru cevabı arıyorum...',
+  'fikirler geliyor...',
+  'analiz ediyorum...',
+  'beynim çalışıyor...',
+  'cevabı hazırlıyorum...'
+]
+
 function answer(input: string): string {
   for (const [pattern, text] of replies) {
     const m = pattern.exec(input)
@@ -63,8 +72,19 @@ export default function AiPage() {
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
   const [thinking, setThinking] = useState(false)
+  const [think, setThink] = useState({ visible: true, index: 0 })
   const endRef = useRef<HTMLDivElement>(null)
   const idRef = useRef(2)
+
+  useEffect(() => {
+    if (!typing) return
+    const t = setInterval(() => {
+      setThink(s =>
+        s.visible ? { visible: false, index: s.index } : { visible: true, index: (s.index + 1) % THINKING_MESSAGES.length }
+      )
+    }, 900)
+    return () => clearInterval(t)
+  }, [typing])
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -73,7 +93,9 @@ export default function AiPage() {
   const send = async () => {
     const text = input.trim()
     if (!text || typing) return
-    const history = [...messages, { id: idRef.current, role: 'user' as const, text }]
+    const userId = idRef.current++
+    const id = idRef.current++
+    const history = [...messages, { id: userId, role: 'user' as const, text }]
     setMessages(history)
     setInput('')
     setTyping(true)
@@ -83,7 +105,6 @@ export default function AiPage() {
       .slice(-20)
       .map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text.slice(0, 1900) }))
 
-    const id = idRef.current++
     let reply = ''
     let streamed = false
 
@@ -163,9 +184,11 @@ export default function AiPage() {
         ))}
         {typing && (
           <div className="flex justify-start">
-            <div className="border bg-card rounded-2xl px-4 py-2.5 text-sm text-muted-foreground">
-              {thinking ? 'düşünüyor...' : 'yazıyor...'}
-            </div>
+            <div className="border bg-card rounded-2xl px-4 py-2.5 text-sm text-muted-foreground transition-opacity duration-700">
+            <span className={thinking && !think.visible ? 'opacity-0' : 'opacity-100'}>
+              {thinking ? THINKING_MESSAGES[think.index] : 'yazıyor...'}
+            </span>
+          </div>
           </div>
         )}
         <div ref={endRef} />
