@@ -74,7 +74,7 @@ const TOOLS = [
 const MAX_BODY_BYTES = 32768
 const MAX_MESSAGES = 24
 const MAX_MESSAGE_LENGTH = 2000
-const MAX_TOKENS = 512
+const MAX_TOKENS = 1024
 const MAX_TOOL_ROUNDS = 5
 const MAX_SEARCH_RESULTS = 8
 const MAX_SNIPPET_LENGTH = 500
@@ -371,6 +371,7 @@ async function chatLoop(messages, maxTokens, env) {
       temperature: 0.7,
       stream: false
     }
+    if (env.THINKING !== 'off') body.reasoning_effort = 'medium'
 
     const upstream = await callUpstream(body, env)
     if (!upstream.ok) {

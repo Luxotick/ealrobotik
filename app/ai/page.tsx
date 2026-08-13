@@ -9,20 +9,28 @@ interface ChatMessage {
   text: string
 }
 
-const replies: Array<[RegExp, string]> = [
+const replies: Array<[RegExp, string | ((input: string, ...args: string[]) => string)]> = [
   [/eğitim/i, 'Eğitimler sayfamızda yazılım ve mekanik için küratörlü kaynaklar var: WPILib, YAGSL, AdvantageScope, Fusion 360 ve daha fazlası. Ana sayfadaki Eğitimler bölümünden ulaşabilirsin.'],
   [/sponsor|destek/i, 'EAL Robotik; İl Milli Eğitim Müdürlüğü, okulumuz, mezunlar derneğimiz ve birçok özel sektör kuruluşu tarafından destekleniyor. Ana sayfadaki sponsor şeridinde tüm destekçilerimizi görebilirsin.'],
   [/performans|kupa|başarı/i, '2021 kuruluşundan bu yana 4 kez play-off gördük; 2026 sezonunda 21. sıradan 5. ittifakın ilk tercihi olarak play-off\'a geçtik. Detaylar Performans tablosunda.'],
   [/iletişim|instagram|ulaş/i, 'Bize Instagram adresimizden ulaşabilirsin: @ealrobotik_8828. Ana sayfanın İletişim bölümünde de mevcut.'],
-  [/takım|üye|katıl/i, 'Takımımız Eskişehir Anadolu Lisesi öğrencilerinden oluşuyor. Katılım ve etkinliklerimiz hakkında bilgi için bize Instagram üzerinden yazabilirsin.'],
-  [/merhaba|selam|hi/i, 'Merhaba! EAL Robotik AI asistanına hoş geldin. Takımımız, eğitimlerimiz veya sponsorlarımız hakkında soru sorabilirsin.']
+  [/araştır|hakkında bilgi|bilgi ver|kimdir|neler yap/i, 'İnternet araştırmam şu an çevrimdışı görünüyor. Sayfayı yenileyip tekrar dene; asistan çevrimiçiyken takım numarasıyla istediğin FRC takımını araştırabilir.'],
+  [/takımımız|takımınız|takımımızdan|takımımızda|kaç kişi|üye sayısı|katıl/i, 'Takımımız Eskişehir Anadolu Lisesi öğrencilerinden oluşuyor; kuruluşumuzda 23 öğrenci ve 3 mentor vardı. Katılım ve etkinliklerimiz için Instagram üzerinden yazabilirsin.'],
+  [/merhaba|selam|hi/i, 'Merhaba! EAL Robotik AI asistanına hoş geldin. Takımımız, eğitimlerimiz veya başka herhangi bir konuda soru sorabilirsin.'],
+  [/(\d+)\s*(artı|eksi|çarpı|bölü|\+|-|\*|\/)\s*(\d+)/, (_m, a, op, b) => {
+    const x = Number(a)
+    const y = Number(b)
+    const res = op === 'artı' || op === '+' ? x + y : op === 'eksi' || op === '-' ? x - y : op === 'çarpı' || op === '*' ? x * y : x / y
+    return `${x} ${op} ${y} = ${res}. Başka nasıl yardımcı olabilirim?`
+  }]
 ]
 
 const fallback = 'Bu konuda sana en iyi nasıl yardımcı olabileceğimi düşünüyorum. Takım, eğitimler veya performans hakkında sorabilirsin. Detaylı bilgi için ana sayfaya veya Instagram hesabımıza göz atabilirsin.'
 
 function answer(input: string): string {
   for (const [pattern, text] of replies) {
-    if (pattern.test(input)) return text
+    const m = pattern.exec(input)
+    if (m) return typeof text === 'function' ? text(input, ...m.slice(1)) : text
   }
   return fallback
 }
