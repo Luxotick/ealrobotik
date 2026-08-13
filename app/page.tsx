@@ -3,6 +3,7 @@ import { Highlights } from '@/components/sections/highlights'
 import { Timeline } from '@/components/sections/timeline'
 import { SponsorMarquee } from '@/components/sections/sponsor-marquee'
 import { Wave } from '@/components/ui/wave'
+import Link from 'next/link'
 import { mission, vision, performances, sponsors, sources, trainingLinks, type SeasonPerformance, type SponsorGroup, type Sponsor, type TrainingLink, type Source } from '@/data/team'
 import { DevSignature } from '@/components/signature'
 
@@ -158,6 +159,18 @@ export default function HomePage() {
         </div>
       </section>
       <section id="egitimler" className="space-y-6 scroll-mt-24 max-w-6xl mx-auto">
+        <div className="flex justify-center pt-4">
+          <div className="relative">
+            <div aria-hidden className="absolute -inset-4 rounded-full bg-highlight/40 blur-xl animate-pulse" />
+            <Link
+              href="/ai"
+              className="relative flex h-20 items-center justify-center overflow-hidden rounded-full border border-highlight/40 bg-card/80 px-8 transition hover:bg-card/60"
+            >
+              <span className="relative z-10 text-xl md:text-2xl font-bold tracking-tight">AI Yardımı</span>
+              <Wave />
+            </Link>
+          </div>
+        </div>
         <div className="text-center space-y-4 max-w-3xl mx-auto">
           <h2 className="text-3xl font-bold tracking-tight">Eğitimler</h2>
           <p className="text-sm text-muted-foreground">Programımız öğrenme kültürünü sistematik kaynaklarla destekler: Yazılım ve mekanik alanlarında küratörlü linkler.</p>

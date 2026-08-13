@@ -1,0 +1,23 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "eal-robotik-ai",
+  "main": "src/index.js",
+  "compatibility_date": "2026-08-11",
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://ealrobotik.com",
+    "MODEL": "opencode-zen/deepseek-v4-flash-free"
+  },
+  "ratelimits": [
+    {
+      "name": "CHAT_LIMITER",
+      "namespace_id": "8828",
+      "simple": {
+        "limit": 30,
+        "period": 60
+      }
+    }
+  ]
+}
