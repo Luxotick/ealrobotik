@@ -1,10 +1,17 @@
 import { SYSTEM_PROMPT } from './system-prompt.js'
 
 const UPSTREAM_URL = 'https://opencode.ai/zen/v1/chat/completions'
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions'
+const GEMINI_FALLBACK_MODELS = [
+  'gemini-3.5-flash',
+  'gemini-3.1-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite'
+]
 const TBA_API_URL = 'https://www.thebluealliance.com/api/v3'
 const DDG_LITE_URL = 'https://lite.duckduckgo.com/lite/'
 const DDG_HTML_URL = 'https://html.duckduckgo.com/html/'
-const DEFAULT_MODEL = 'opencode-zen/deepseek-v4-flash-free'
+const DEFAULT_MODEL = 'deepseek-v4-flash-free'
 const BROWSER_UA =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 ' +
   '(KHTML, like Gecko) Chrome/124.0 Safari/537.36'
@@ -15,14 +22,14 @@ const TOOLS = [
     function: {
       name: 'get_team_info',
       description:
-        'The Blue Alliance platformu üzerinden FRC takım bilgisi aratması yapar. ' +
-        'Çıktı JSON formatında döner. Girdi olarak takım numarası girilmelidir (örn. 8828).',
+        'The Blue Alliance platformu Ã¼zerinden FRC takÄ±m bilgisi aratmasÄ± yapar. ' +
+        'Ã‡Ä±ktÄ± JSON formatÄ±nda dÃ¶ner. Girdi olarak takÄ±m numarasÄ± girilmelidir (Ã¶rn. 8828).',
       parameters: {
         type: 'object',
         properties: {
           team_number: {
             type: 'integer',
-            description: 'FRC takım numarası (örn. 8828)'
+            description: 'FRC takÄ±m numarasÄ± (Ã¶rn. 8828)'
           }
         },
         required: ['team_number']
@@ -34,15 +41,15 @@ const TOOLS = [
     function: {
       name: 'search',
       description:
-        'İnternette web araması yapar ve sonuç listesi döndürür. ' +
-        'Güncel bilgi, haber, sonuç veya dış doğrulama gerektiren sorularda kullan. ' +
-        'Sonuçlar title, url ve snippet alanlarıyla JSON liste olarak gelir.',
+        'Ä°nternette web aramasÄ± yapar ve sonuÃ§ listesi dÃ¶ndÃ¼rÃ¼r. ' +
+        'GÃ¼ncel bilgi, haber, sonuÃ§ veya dÄ±ÅŸ doÄŸrulama gerektiren sorularda kullan. ' +
+        'SonuÃ§lar title, url ve snippet alanlarÄ±yla JSON liste olarak gelir.',
       parameters: {
         type: 'object',
         properties: {
           query: {
             type: 'string',
-            description: 'Net ve kısa arama sorgusu (örn. "FRC 2026 REBUILT")'
+            description: 'Net ve kÄ±sa arama sorgusu (Ã¶rn. "FRC 2026 REBUILT")'
           }
         },
         required: ['query']
@@ -54,15 +61,15 @@ const TOOLS = [
     function: {
       name: 'fetch_page',
       description:
-        'Verilen URLdeki web sayfasını açar ve sayfanın metin içeriğini döndürür. ' +
-        'Arama sonuçlarındaki siteleri incelemek, detaylı bilgi almak için kullan. ' +
-        'Sayfa HTMLden arındırılmış düz metin olarak gelir.',
+        'Verilen URLdeki web sayfasÄ±nÄ± aÃ§ar ve sayfanÄ±n metin iÃ§eriÄŸini dÃ¶ndÃ¼rÃ¼r. ' +
+        'Arama sonuÃ§larÄ±ndaki siteleri incelemek, detaylÄ± bilgi almak iÃ§in kullan. ' +
+        'Sayfa HTMLden arÄ±ndÄ±rÄ±lmÄ±ÅŸ dÃ¼z metin olarak gelir.',
       parameters: {
         type: 'object',
         properties: {
           url: {
             type: 'string',
-            description: 'Ziyaret edilecek sayfanın tam URLsi (https:// ile başlamalı)'
+            description: 'Ziyaret edilecek sayfanÄ±n tam URLsi (https:// ile baÅŸlamalÄ±)'
           }
         },
         required: ['url']
@@ -82,6 +89,7 @@ const MAX_QUERY_LENGTH = 300
 const MAX_PAGE_CHARS = 8000
 const MAX_PAGE_BYTES = 5 * 1024 * 1024
 const UPSTREAM_TIMEOUT_MS = 30000
+const STREAM_TIMEOUT_MS = 120000
 
 function sanitizeMessages(messages) {
   const out = []
@@ -272,15 +280,17 @@ function parseSearchResults(html) {
   return results
 }
 
-async function callUpstream(body, env) {
+async function callUpstream(body, env, ip, timeoutMs = UPSTREAM_TIMEOUT_MS) {
   return fetch(UPSTREAM_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${env.OPENCODE_API_KEY}`
+      Authorization: `Bearer ${env.OPENCODE_API_KEY}`,
+      'User-Agent': 'opencode/1.21.12',
+      'x-real-ip': ip
     },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS)
+    signal: AbortSignal.timeout(timeoutMs)
   })
 }
 
@@ -321,7 +331,7 @@ export default {
     if (!success) {
       return json(429, {
         error: 'rate_limited',
-        message: 'Çok fazla istek gönderdin, bir dakika bekleyip tekrar dene.'
+        message: 'Ã‡ok fazla istek gÃ¶nderdin, bir dakika bekleyip tekrar dene.'
       })
     }
 
@@ -349,17 +359,51 @@ export default {
 
     let data
     try {
-      data = await chatLoop(messages, maxTokens, env)
+      data =
+        payload.stream === true
+          ? await runLoopStream(messages, maxTokens, env, ip)
+          : await chatLoop(messages, maxTokens, env, ip)
     } catch (err) {
       console.error('upstream_unreachable', err.message)
       return json(502, { error: 'upstream_unreachable' })
+    }
+
+    if (payload.stream === true) {
+      return new Response(data, {
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'text/event-stream; charset=utf-8',
+          'Cache-Control': 'no-cache, no-transform',
+          Connection: 'keep-alive'
+        }
+      })
     }
 
     return json(200, data)
   }
 }
 
-async function chatLoop(messages, maxTokens, env) {
+async function chatLoop(messages, maxTokens, env, ip) {
+  const routes = [(body) => callUpstream(body, env, ip)]
+  if (env.GOOGLE_API_KEY) {
+    for (const model of GEMINI_FALLBACK_MODELS) {
+      routes.push((body) => callGemini(body, env, model))
+    }
+  }
+  let lastErr = null
+  for (const route of routes) {
+    try {
+      return await runLoop(messages, maxTokens, env, route)
+    } catch (err) {
+      lastErr = err
+      console.error('route_failed', err.message.slice(0, 200))
+    }
+  }
+  throw lastErr || new Error('no_route_available')
+}
+
+async function runLoop(messages, maxTokens, env, route) {
   let responseData = null
   for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
     const body = {
@@ -373,7 +417,7 @@ async function chatLoop(messages, maxTokens, env) {
     }
     if (env.THINKING !== 'off') body.reasoning_effort = 'medium'
 
-    const upstream = await callUpstream(body, env)
+    const upstream = await route(body)
     if (!upstream.ok) {
       const detail = await upstream.text().catch(() => '')
       console.error('upstream_status', upstream.status)
@@ -386,6 +430,8 @@ async function chatLoop(messages, maxTokens, env) {
     } catch {
       throw new Error('upstream_invalid_response')
     }
+    const firstMessage = parsed.choices?.[0]?.message
+    if (firstMessage?.extra_content) delete firstMessage.extra_content
     responseData = parsed
 
     const message = parsed.choices?.[0]?.message
@@ -406,4 +452,153 @@ async function chatLoop(messages, maxTokens, env) {
     }
   }
   return responseData
+}
+
+async function callGemini(body, env, model, timeoutMs = UPSTREAM_TIMEOUT_MS) {
+  return fetch(GEMINI_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${env.GOOGLE_API_KEY}`
+    },
+    body: JSON.stringify({ ...body, model }),
+    signal: AbortSignal.timeout(timeoutMs)
+  })
+}
+
+function runLoopStream(messages, maxTokens, env, ip) {
+  return new ReadableStream({
+    async start(controller) {
+      const emit = obj => {
+        try {
+          controller.enqueue(new TextEncoder().encode('data: ' + JSON.stringify(obj) + '\n\n'))
+        } catch {}
+      }
+      const routes = [(body, t) => callUpstream(body, env, ip, t)]
+      if (env.GOOGLE_API_KEY) {
+        for (const model of GEMINI_FALLBACK_MODELS) {
+          routes.push((body, t) => callGemini(body, env, model, t))
+        }
+      }
+
+      let lastErr = null
+      for (const route of routes) {
+        try {
+          await streamRounds(messages, maxTokens, env, route, emit)
+          try {
+            controller.close()
+          } catch {}
+          return
+        } catch (err) {
+          lastErr = err
+          console.error('stream_route_failed', err.message.slice(0, 200))
+        }
+      }
+      emit({ type: 'error', message: (lastErr?.message || 'no_route').slice(0, 200) })
+      try {
+        controller.close()
+      } catch {}
+    }
+  })
+}
+
+async function streamRounds(messages, maxTokens, env, route, emit) {
+  for (let round = 0; round <= MAX_TOOL_ROUNDS; round++) {
+    emit({ type: 'thinking' })
+    const body = {
+      model: env.MODEL || DEFAULT_MODEL,
+      messages,
+      tools: TOOLS,
+      tool_choice: 'auto',
+      max_tokens: maxTokens,
+      temperature: 0.7,
+      stream: true
+    }
+    if (env.THINKING !== 'off') body.reasoning_effort = 'medium'
+
+    const upstream = await route(body, STREAM_TIMEOUT_MS)
+    if (!upstream.ok) {
+      const detail = await upstream.text().catch(() => '')
+      console.error('upstream_status', upstream.status)
+      throw new Error('upstream_status_' + upstream.status + '_' + detail.slice(0, 200))
+    }
+
+    const { content, toolCalls } = await readStream(upstream, emit)
+    if (!toolCalls.length) {
+      emit({ type: 'done' })
+      return
+    }
+
+    messages.push({ role: 'assistant', content, tool_calls: toolCalls })
+    for (const call of toolCalls) {
+      if (call.type !== 'function' || !call.id) continue
+      let args = {}
+      try {
+        args = JSON.parse(call.function.arguments || '{}')
+      } catch {
+        args = {}
+      }
+      const toolContent = await runTool(call.function.name, args, env)
+      messages.push({ role: 'tool', tool_call_id: call.id, content: toolContent })
+    }
+  }
+  emit({ type: 'done' })
+}
+
+async function readStream(upstream, emit) {
+  const reader = upstream.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+  let content = ''
+  const toolCalls = new Map()
+  try {
+    while (true) {
+      const { done, value } = await reader.read()
+      if (done) break
+      buffer += decoder.decode(value, { stream: true })
+      let idx
+      while ((idx = buffer.indexOf('\n')) !== -1) {
+        const line = buffer.slice(0, idx).trim()
+        buffer = buffer.slice(idx + 1)
+        if (!line.startsWith('data:')) continue
+        const data = line.slice(5).trim()
+        if (data === '[DONE]') return { content, toolCalls: [...toolCalls.values()] }
+        let j
+        try {
+          j = JSON.parse(data)
+        } catch {
+          continue
+        }
+        const delta = j.choices?.[0]?.delta
+        if (!delta) continue
+        if (delta.content) {
+          content += delta.content
+          emit({ type: 'text', text: delta.content })
+        }
+        if (delta.tool_calls) {
+          for (const tc of delta.tool_calls) {
+            let acc = toolCalls.get(tc.index ?? 0)
+            if (!acc) {
+              acc = {
+                index: tc.index ?? 0,
+                id: '',
+                type: 'function',
+                function: { name: '', arguments: '' }
+              }
+              toolCalls.set(acc.index, acc)
+            }
+            if (tc.id) acc.id = tc.id
+            if (tc.type) acc.type = tc.type
+            if (tc.function?.name) acc.function.name += tc.function.name
+            if (tc.function?.arguments) acc.function.arguments += tc.function.arguments
+          }
+        }
+      }
+    }
+  } finally {
+    try {
+      reader.releaseLock()
+    } catch {}
+  }
+  return { content, toolCalls: [...toolCalls.values()] }
 }

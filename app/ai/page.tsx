@@ -35,12 +35,34 @@ function answer(input: string): string {
   return fallback
 }
 
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+}
+
+function renderMarkdown(text: string): string {
+  let s = escapeHtml(text)
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+  s = s.replace(/`([^`]+)`/g, '<code>$1</code>')
+  s = s.replace(/(^|[\s(])\*([^*\n]+)\*/g, '$1<em>$2</em>')
+  s = s.replace(
+    /\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>'
+  )
+  return s
+}
+
 export default function AiPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { id: 1, role: 'ai', text: 'Merhaba! EAL Robotik AI asistanına hoş geldin. Ne öğrenmek istersin?' }
   ])
   const [input, setInput] = useState('')
   const [typing, setTyping] = useState(false)
+  const [thinking, setThinking] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
   const idRef = useRef(2)
 
@@ -55,28 +77,73 @@ export default function AiPage() {
     setMessages(history)
     setInput('')
     setTyping(true)
+    setThinking(true)
 
     const chat: Array<{ role: string; content: string }> = history
       .slice(-20)
       .map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text.slice(0, 1900) }))
 
-    let reply: string
+    const id = idRef.current++
+    let reply = ''
+    let streamed = false
+
     try {
       const res = await fetch(AI_WORKER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chat })
+        body: JSON.stringify({ messages: chat, stream: true })
       })
-      if (!res.ok) throw new Error('worker_error_' + res.status)
-      const data = await res.json()
-      reply = data?.choices?.[0]?.message?.content?.trim()
-      if (!reply) throw new Error('empty_reply')
+      if (!res.ok || !res.body) throw new Error('worker_error_' + res.status)
+      const ctype = res.headers.get('Content-Type') || ''
+      if (!ctype.includes('text/event-stream')) {
+        const data = await res.json()
+        reply = data?.choices?.[0]?.message?.content?.trim() || ''
+        if (!reply) throw new Error('empty_reply')
+        streamed = true
+      } else {
+        const reader = res.body.getReader()
+        const decoder = new TextDecoder()
+        let buffer = ''
+        for (;;) {
+          const { done, value } = await reader.read()
+          if (done) break
+          buffer += decoder.decode(value, { stream: true })
+          const events = buffer.split('\n\n')
+          buffer = events.pop() ?? ''
+          for (const ev of events) {
+            const line = ev.split('\n').find(l => l.startsWith('data:'))
+            if (!line) continue
+            const data = line.slice(5).trim()
+            if (!data) continue
+            let j: { type?: string; text?: string }
+            try {
+              j = JSON.parse(data)
+            } catch {
+              continue
+            }
+            if (j.type === 'thinking') {
+              setThinking(true)
+            } else if (j.type === 'text' && j.text) {
+              setThinking(false)
+              streamed = true
+              reply += j.text
+              setMessages(prev => prev.map(m => (m.id === id ? { ...m, text: reply } : m)))
+            } else if (j.type === 'error') {
+              throw new Error('stream_error')
+            }
+          }
+        }
+      }
     } catch {
-      reply = answer(text)
+      streamed = false
     }
 
+    setThinking(false)
     setTyping(false)
-    setMessages(prev => [...prev, { id: idRef.current++, role: 'ai', text: reply }])
+    if (!streamed || !reply) {
+      setMessages(prev => prev.filter(m => m.id !== id))
+      setMessages(prev => [...prev, { id, role: 'ai', text: answer(text) }])
+    }
   }
 
   return (
@@ -90,13 +157,15 @@ export default function AiPage() {
         {messages.map(m => (
           <div key={m.id} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
             <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm whitespace-pre-wrap ${m.role === 'user' ? 'bg-primary text-primary-foreground' : 'border bg-card'}`}>
-              {m.text}
+              <div dangerouslySetInnerHTML={{ __html: renderMarkdown(m.text) }} />
             </div>
           </div>
         ))}
         {typing && (
           <div className="flex justify-start">
-            <div className="border bg-card rounded-2xl px-4 py-2.5 text-sm text-muted-foreground">yazıyor...</div>
+            <div className="border bg-card rounded-2xl px-4 py-2.5 text-sm text-muted-foreground">
+              {thinking ? 'düşünüyor...' : 'yazıyor...'}
+            </div>
           </div>
         )}
         <div ref={endRef} />
