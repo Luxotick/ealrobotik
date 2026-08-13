@@ -12,6 +12,7 @@ import baranisikLogo from '@/assets/baranisik.webp'
 import baranisikDarkLogo from '@/assets/baranisik_dark.webp'
 import ealLogo from '@/assets/eal.webp'
 import korelLogo from '@/assets/korel.webp'
+import m3Logo from '@/assets/3m.webp'
 
 export const mission = `Teknolojinin hayatımızın her alanına girdiği şu günlerde teknolojik gelişmelere katkı sağlayacak gençleri destekleyen bir yarışın parçası olmak, şehrimizi ve ülkemizi en iyi şekilde temsil etmektir. Hem takım hem de bireysel anlamda edindiğimiz bilgi ve tecrübeleri ülkemizin geleceği olan çocuklara aktarmak, onlara rol model olmaktır.`
 
@@ -98,7 +99,8 @@ export const sponsors: SponsorGroup[] = [
       { name: 'SolidWorks Corp.', logo: solidworksLogo.src },
       { name: 'İkizler Mantı ve Börek', logo: ikizlerLogo.src },
       { name: 'Boeing Corp.', logo: boeingLogo.src, logoClass: 'sponsor-black' },
-      { name: 'Baran Işık', logo: baranisikLogo.src, logoLight: baranisikDarkLogo.src }
+      { name: 'Baran Işık', logo: baranisikLogo.src, logoLight: baranisikDarkLogo.src },
+      { name: '3M Company', logo: m3Logo.src }
     ]
   }
 ]

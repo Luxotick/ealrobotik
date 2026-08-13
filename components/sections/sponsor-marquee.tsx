@@ -12,7 +12,7 @@ export function SponsorMarquee() {
   const pauseFor = () => {
     setPaused(true)
     if (resumeTimer.current) clearTimeout(resumeTimer.current)
-    resumeTimer.current = setTimeout(() => setPaused(false), 2000)
+    resumeTimer.current = setTimeout(() => setPaused(false), 650)
   }
 
   return (
