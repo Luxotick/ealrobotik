@@ -1,7 +1,8 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { ReactNode } from 'react'
-import { SiteChrome } from '@/components/site-chrome'
+import { SiteHeader } from '@/components/site-header'
+import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from '@/components/theme-provider'
 
 export const metadata: Metadata = {
@@ -87,9 +88,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SiteChrome>
-            <main className="flex-1 container py-8">{children}</main>
-          </SiteChrome>
+          <SiteHeader />
+          <main className="flex-1 container py-8">{children}</main>
+          <SiteFooter />
         </ThemeProvider>
       </body>
     </html>

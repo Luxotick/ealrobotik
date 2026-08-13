@@ -1,1 +1,0 @@
-This folder contains the built output assets for the worker "eal-robotik-ai" generated at 2026-08-13T00:18:32.976Z.
