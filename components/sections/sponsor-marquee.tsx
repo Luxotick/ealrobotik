@@ -35,11 +35,11 @@ export function SponsorMarquee() {
           <li key={i} className="flex items-center gap-2.5 text-sm font-medium whitespace-nowrap text-muted-foreground hover:text-foreground transition-colors select-none">
             {s.logo && (s.logoLight ? (
             <>
-              <img src={s.logo} alt="" aria-hidden draggable={false} className={`h-6 w-auto object-contain select-none theme-dark-only ${s.logoClass ?? ''}`} />
-              <img src={s.logoLight} alt={s.name} draggable={false} className={`h-6 w-auto object-contain select-none theme-light-only ${s.logoClass ?? ''}`} />
+              <img src={s.logo} alt="" aria-hidden draggable={false} loading="eager" decoding="async" className={`h-6 w-auto object-contain select-none theme-dark-only ${s.logoClass ?? ''}`} />
+              <img src={s.logoLight} alt={s.name} draggable={false} loading="eager" decoding="async" className={`h-6 w-auto object-contain select-none theme-light-only ${s.logoClass ?? ''}`} />
             </>
           ) : (
-            <img src={s.logo} alt={s.name} draggable={false} className={`h-6 w-auto object-contain select-none ${s.logoClass ?? ''}`} />
+            <img src={s.logo} alt={s.name} draggable={false} loading="eager" decoding="async" className={`h-6 w-auto object-contain select-none ${s.logoClass ?? ''}`} />
           ))}
             <span>{s.name}</span>
           </li>

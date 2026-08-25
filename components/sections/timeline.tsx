@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { timelinePhotos } from '@/data/timeline-photos'
+import { preloadSingleImage } from '@/lib/image-preloader'
 
 const milestones = [
   { year: 2021, title: 'Kuruluş', desc: '23 öğrenci ve 3 mentor ile takım kuruldu.' },
@@ -14,6 +15,14 @@ const milestones = [
 function YearPhotos({ year, photos, itemIndex }: { year: number; photos: string[]; itemIndex: number }) {
   const [idx, setIdx] = useState(0)
   const count = photos.length
+
+  useEffect(() => {
+    if (count <= 1) return
+
+    // sonraki gorselleri hemen hazirlayalim
+    preloadSingleImage(photos[(idx + 1) % count])
+    preloadSingleImage(photos[(idx + 2) % count])
+  }, [idx, photos, count])
 
   useEffect(() => {
     if (count <= 1) return
@@ -45,7 +54,13 @@ function YearPhotos({ year, photos, itemIndex }: { year: number; photos: string[
           key={photos[idx]}
           src={photos[idx]}
           alt={`${year} fotoğraf ${idx + 1}`}
-          loading="lazy"
+          loading="eager"
+          decoding="async"
+          onError={() => {
+            if (count > 1) {
+              setIdx((prev) => (prev + 1) % count)
+            }
+          }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}

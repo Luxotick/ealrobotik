@@ -4,6 +4,7 @@ import { ReactNode } from 'react'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
 import { ThemeProvider } from '@/components/theme-provider'
+import { ImagePreloader } from '@/components/image-preloader'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ealrobotik.com'),
@@ -88,6 +89,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           }}
         />
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ImagePreloader />
           <SiteHeader />
           <main className="flex-1 container py-8">{children}</main>
           <SiteFooter />
