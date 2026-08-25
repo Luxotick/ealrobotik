@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Inter font (değiştirilebilir) */
+/* inter font */
 @layer base {
   :root {
     --font-sans: 'Inter', system-ui, sans-serif;
@@ -98,7 +98,7 @@ html::-webkit-scrollbar { display: none; }
 html, body { overflow-x: clip; }
 section[id] { scroll-margin-top: 6rem; }
 
-/* Cam / glass yardımcı sınıflar */
+/* glass helper classes */
 .glass {
   background-color: hsl(var(--background)/0.5);
   backdrop-filter: blur(12px) saturate(150%);
@@ -107,7 +107,7 @@ section[id] { scroll-margin-top: 6rem; }
   box-shadow: 0 2px 12px -2px hsl(var(--foreground)/0.08);
 }
 
-/* Yarı saydam panel */
+/* translucent panel */
 .glass-panel {
   background-color: hsl(var(--card)/0.45);
   backdrop-filter: blur(14px) saturate(140%);
@@ -116,11 +116,11 @@ section[id] { scroll-margin-top: 6rem; }
   box-shadow: 0 4px 20px -2px hsl(var(--foreground)/0.05), 0 0 0 1px hsl(var(--foreground)/0.03) inset;
 }
 
-/* Yumuşak giriş animasyonu */
+/* soft entrance animation */
 @keyframes fade-in-up { from { opacity:0; transform: translateY(12px);} to { opacity:1; transform: translateY(0);} }
 .fade-in-up { animation: fade-in-up .6s cubic-bezier(.16,.8,.31,1) both; }
 
-/* Dalga animasyonlari - seamless loop */
+/* wave animations, seamless loop */
 @keyframes wave-drift-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 @keyframes wave-drift-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
 .wave-track-back { animation: wave-drift-left 24s linear infinite; }
@@ -129,22 +129,22 @@ section[id] { scroll-margin-top: 6rem; }
   .wave-track-back, .wave-track-front { animation: none; }
 }
 
-/* Gradient metin yardımcıları */
+/* gradient text helpers */
 .gradient-text { background: linear-gradient(90deg,hsl(var(--primary)),hsl(216.9 33.3% 22.9%)); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
-/* Sponsor logo filtreleri */
+/* sponsor logo filters */
 .sponsor-black { filter: brightness(0); }
 :is(.dark) .sponsor-black { filter: none; }
 .sponsor-white { filter: none; }
 :is(.dark) .sponsor-white { filter: brightness(0) invert(1); }
 
-/* Tema bazlı logo değişimi */
+/* theme based logo swap */
 .theme-light-only { display: block; }
 :is(.dark) .theme-light-only { display: none; }
 .theme-dark-only { display: none; }
 :is(.dark) .theme-dark-only { display: block; }
 
-/* Scrollbar minimal (Webkit) */
+/* minimal scrollbar */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: hsl(var(--muted)); border-radius: 6px; }

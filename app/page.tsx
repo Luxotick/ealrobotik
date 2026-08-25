@@ -1,5 +1,4 @@
 import { Hero } from '@/components/sections/hero'
-import { Highlights } from '@/components/sections/highlights'
 import { Timeline } from '@/components/sections/timeline'
 import { SponsorMarquee } from '@/components/sections/sponsor-marquee'
 import { Wave } from '@/components/ui/wave'
@@ -33,7 +32,6 @@ export default function HomePage() {
           <div className="space-y-3 md:col-span-1">
             <h3 className="text-lg font-semibold">Felsefe</h3>
             <p className="text-sm leading-relaxed text-muted-foreground">Akademik seçiciliğin sunduğu yetenek yoğunluğu + toplumsal etki odaklı uzun vadeli program vizyonu ile sürdürülebilir başarı modeli.</p>
-            <Highlights />
           </div>
         </div>
       </section>
@@ -53,7 +51,6 @@ export default function HomePage() {
                 <th className="p-2">Kayıt</th>
                 <th className="p-2">Play-off</th>
                 <th className="p-2">Seçim</th>
-                <th className="p-2">Not</th>
               </tr>
             </thead>
             <tbody>
@@ -65,7 +62,6 @@ export default function HomePage() {
                   <td className="p-2">{p.record ? `${p.record.wins}-${p.record.losses}${p.record.ties ? '-' + p.record.ties : ''}` : '—'}</td>
                   <td className="p-2">{p.playoff}</td>
                   <td className="p-2">{p.alliancePick || '—'}</td>
-                  <td className="p-2 text-xs text-muted-foreground max-w-xs">{p.notes}</td>
                 </tr>
               ))}
             </tbody>
@@ -219,7 +215,8 @@ export default function HomePage() {
           <h2 className="text-3xl font-bold tracking-tight">Sosyal Sorumluluk</h2>
           <p className="text-sm text-muted-foreground max-w-2xl mx-auto">Waves of Innovation girişimimiz, genç nesilleri okyanusları ve su ekosistemlerini koruma konusunda bilinçlendirmeyi, STEM ve çevresel sorumluluk kavramlarını birleştiren etkinlik ve içerikler üretmeyi amaçlıyor.</p>
         </div>
-  <div className="relative overflow-hidden rounded-xl border p-6 glass-panel space-y-4">
+  <div className="grid md:grid-cols-2 gap-6">
+        <div className="relative overflow-hidden rounded-xl border p-6 glass-panel space-y-4">
           <h3 className="font-semibold text-lg text-highlight relative z-10">Waves of Innovation</h3>
           <p className="text-sm text-muted-foreground relative z-10">"Empowering future generations to protect our oceans, one wave at a time." Yaklaşımıyla çevresel duyarlılığı teknik problem çözme ile buluşturan bir sosyal etki programı.</p>
           <div className="relative z-10">
@@ -227,6 +224,15 @@ export default function HomePage() {
           </div>
           <Wave />
         </div>
+        <div className="relative overflow-hidden rounded-xl border p-6 glass-panel space-y-4">
+          <h3 className="font-semibold text-lg text-highlight relative z-10">Girls of Innovation</h3>
+          <p className="text-sm text-muted-foreground relative z-10">Kız çocukları ve genç kadınların STEM alanlarındaki önyargıları ve korkuları aşmalarına destek olan, atölye çalışmaları ve mentorluk oturumlarıyla özgüven kazandırmayı hedefleyen sosyal etki programı.</p>
+          <div className="relative z-10">
+            <a href="https://girls.ealrobotik.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-md bg-[#ec4899] px-5 py-2 text-sm font-medium text-white hover:bg-[#ec4899]/90 transition">Proje Sitesini Ziyaret Et</a>
+          </div>
+          <Wave backColor="#9d174d" frontColor="#f9a8d4" />
+        </div>
+      </div>
       </section>
       <section id="iletisim" className="space-y-6 scroll-mt-24 max-w-2xl mx-auto text-center">
           <h2 className="text-3xl font-bold tracking-tight">İletişim</h2>

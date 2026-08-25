@@ -46,12 +46,12 @@ export function Hero() {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.35, duration: 0.5 }}
-        className="flex flex-wrap gap-3 justify-center"
+        className="flex flex-wrap gap-x-14 gap-y-6 justify-center"
       >
         {stats.map(s => (
-          <div key={s.label} className="px-4 py-2 rounded-full glass text-sm flex items-center gap-2">
-            <span className="font-semibold text-highlight">{s.value}</span>
-            <span className="text-muted-foreground text-xs uppercase tracking-wide">{s.label}</span>
+          <div key={s.label} className="text-center leading-tight">
+            <div className="font-semibold text-highlight text-sm md:text-base">{s.value}</div>
+            <div className="text-xs text-muted-foreground uppercase tracking-wide">{s.label}</div>
           </div>
         ))}
       </motion.div>

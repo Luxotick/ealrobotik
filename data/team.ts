@@ -116,12 +116,15 @@ export const sources: Source[] = [
 export interface TrainingLink { title: string; url: string; category: 'software' | 'mechanical' | 'document' }
 
 export const trainingLinks: TrainingLink[] = [
+  { title: 'Python Full Course', url: 'https://www.youtube.com/watch?v=K5KVEU3aaeQ', category: 'software' },
+  { title: '1 Saatte Python (Türkçe)', url: 'https://www.youtube.com/watch?v=_wZUNiGtkcw', category: 'software' },
+  { title: 'FRC Python Programming', url: 'https://docs.wpilib.org/tr/stable/docs/software/python/index.html', category: 'software' },
+  { title: 'RobotPy API Docs', url: 'https://robotpy.readthedocs.io/projects/robotpy/tr/stable/', category: 'software' },
   { title: 'WPILib Docs', url: 'https://docs.wpilib.org/en/stable/', category: 'software' },
-  { title: 'WPILib VSCode Installer (Windows)', url: 'https://packages.wpilib.workers.dev/installer/v2024.3.2/Win64/WPILib_Windows-2024.3.2.iso', category: 'software' },
+  { title: 'WPILib Kurulum Kılavuzu', url: 'https://docs.wpilib.org/tr/stable/docs/zero-to-robot/step-2/wpilib-setup.html', category: 'software' },
   { title: 'GitHub', url: 'https://github.com/', category: 'software' },
   { title: 'GitHub Student Pack', url: 'https://education.github.com/pack', category: 'software' },
   { title: 'ChiefDelphi Forum', url: 'https://www.chiefdelphi.com/', category: 'software' },
-  { title: 'FRC Java Programming Tutorial Playlist', url: 'https://www.youtube.com/watch?v=PdgXk6D311k&list=PLC3-At2hTK9hVPv623YealxDAHim6FdJQ', category: 'software' },
   { title: 'Fusion 360', url: 'https://www.autodesk.com/', category: 'mechanical' },
   { title: 'Fusion 360 Education Pack', url: 'https://www.autodesk.com/education/edu-software/overview', category: 'mechanical' },
   { title: 'Fusion 360 Kurulum & Eğitim Videosu', url: 'https://www.youtube.com/watch?v=ufBiBPoZJuI', category: 'mechanical' },
