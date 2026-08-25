@@ -226,7 +226,7 @@ export default function HomePage() {
         </div>
         <div className="relative overflow-hidden rounded-xl border p-6 glass-panel space-y-4">
           <h3 className="font-semibold text-lg text-highlight relative z-10">Girls of Innovation</h3>
-          <p className="text-sm text-muted-foreground relative z-10">Kız çocukları ve genç kadınların STEM alanlarındaki önyargıları ve korkuları aşmalarına destek olan, atölye çalışmaları ve mentorluk oturumlarıyla özgüven kazandırmayı hedefleyen sosyal etki programı.</p>
+          <p className="text-sm text-muted-foreground relative z-10">"Empowering girls to break STEM barriers, one innovation at a time." yaklaşımıyla STEM alanlarındaki önyargıları teknik gelişim ve mentorlukla yıkan bir sosyal etki programı.</p>
           <div className="relative z-10">
             <a href="https://girls.ealrobotik.com/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-md bg-[#ec4899] px-5 py-2 text-sm font-medium text-white hover:bg-[#ec4899]/90 transition">Proje Sitesini Ziyaret Et</a>
           </div>
