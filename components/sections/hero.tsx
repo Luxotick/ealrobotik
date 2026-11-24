@@ -1,60 +1,52 @@
-"use client"
-import { Button } from '@/components/ui/button'
-import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { ArrowDown, ArrowUpRight } from 'lucide-react'
 
 const stats = [
-  { label: 'Kuruluş', value: '2021' },
-  { label: 'Play-off Görünümü', value: '4' },
-  { label: 'FRC Takım', value: '8828' }
+  { label: 'Kuruluş', value: '2019' },
+  { label: 'Robot yarışmaları', value: 'MEB' },
+  { label: 'İHA Performans Ödülü', value: '2023' },
 ]
 
 export function Hero() {
   return (
-    <section className="relative text-center space-y-10 py-8 md:py-14">
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-        className="text-4xl md:text-6xl font-bold tracking-tight leading-tight"
-      >
-        <span className="gradient-text">EAL Robotik</span>{' '}
-        <span className="text-muted-foreground">FRC 8828</span>
-      </motion.h1>
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.6 }}
-        className="text-muted-foreground max-w-2xl mx-auto text-lg"
-      >
-        Eskişehir Anadolu Lisesi'nin rekabetçi robotik ve toplumsal etki odaklı gençlik STEM programı.
-      </motion.p>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.6 }}
-        className="flex gap-4 justify-center"
-      >
-        <Button asChild size="lg">
-          <Link href="#hakkinda">Takımı Tanıyın</Link>
-        </Button>
-        <Button variant="outline" asChild size="lg">
-          <Link href="#performans">Performans</Link>
-        </Button>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.5 }}
-        className="flex flex-wrap gap-x-14 gap-y-6 justify-center"
-      >
-        {stats.map(s => (
-          <div key={s.label} className="text-center leading-tight">
-            <div className="font-semibold text-highlight text-sm md:text-base">{s.value}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wide">{s.label}</div>
+    <section id="hero" className="site-hero" aria-labelledby="hero-title">
+      <div className="hero-main">
+        <div className="hero-copy">
+          <p className="hero-school technical-label">Eskişehir Anadolu Lisesi</p>
+          <h1 id="hero-title" className="hero-title">EAL <span>Robotik</span></h1>
+          <p className="hero-intro">
+            Birlikte robot tasarlayan, öğrendiklerini paylaşan ve MEB robot yarışmalarına katılan bir öğrenci kulübüyüz.
+          </p>
+          <div className="hero-actions">
+            <a className="site-button site-button-primary" href="#performans">Yarışmalarımız <ArrowDown aria-hidden="true" /></a>
+            <a className="site-button site-button-secondary" href="#projeler">Projelerimiz <ArrowUpRight aria-hidden="true" /></a>
+          </div>
+        </div>
+
+        <figure className="hero-figure">
+          <div className="hero-photo">
+            <img
+              src="/timeline/2025/_DSF5367.webp"
+              alt="EAL Robotik öğrencileri yarışma tribününde 8828 takım numarasını taşıyor"
+              width={3120}
+              height={1760}
+              fetchPriority="high"
+            />
+          </div>
+          <figcaption className="hero-caption technical-label">
+            <span><span className="registration-mark" aria-hidden="true" /> Takım 8828</span>
+            <span>FRC arşivi / 2025</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <dl className="hero-stats">
+        {stats.map(({ label, value }) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
           </div>
         ))}
-      </motion.div>
+      </dl>
     </section>
   )
 }

@@ -43,7 +43,6 @@ export function getOrderedPreloadList(): string[] {
   for (const group of sponsors) {
     for (const item of group.sponsors) {
       add(item.logo)
-      add(item.logoLight)
     }
   }
 

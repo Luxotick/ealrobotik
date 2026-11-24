@@ -1,97 +1,92 @@
 'use client'
+
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { usePathname } from 'next/navigation'
+import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import favicon from '../assets/favicon.ico'
 
 const nav = [
   { href: '#about', label: 'About' },
-  { href: '#barriers', label: 'Break the Barriers' },
-  { href: '#what-we-do', label: 'What We Do' },
+  { href: '#barriers', label: 'Break the barriers' },
+  { href: '#what-we-do', label: 'What we do' },
   { href: '#impact', label: 'Impact' },
   { href: '#gallery', label: 'Gallery' },
-  { href: '#contact', label: 'Contact' }
+  { href: '#contact', label: 'Contact' },
 ] as const
 
 export function SiteHeader() {
-  const [hidden, setHidden] = useState(false)
-  const [active, setActive] = useState(`#${nav[0].href.replace('#', '')}`)
-  const lastY = useRef(0)
-  const autoScroll = useRef(false)
+  const isHome = usePathname() === '/'
+  const [active, setActive] = useState('')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY
-      const dy = y - lastY.current
-      lastY.current = y
-      if (autoScroll.current) {
-        setHidden(false)
-        if (Math.abs(dy) < 2) autoScroll.current = false
-        return
-      }
-      if (y < 300) {
-        setHidden(false)
-        return
-      }
-      if (dy < -5) setHidden(false)
-      else if (dy > 5) setHidden(true)
+    if (!isHome) return
+
+    const observer = new IntersectionObserver(entries => {
+      const section = entries.find(entry => entry.isIntersecting)
+      if (section) setActive(section.target.id === 'hero' ? '' : '#' + section.target.id)
+    }, { rootMargin: '-16% 0px -70% 0px' })
+
+    for (const hash of ['#hero', ...nav.map(item => item.href)]) {
+      const section = document.getElementById(hash.slice(1))
+      if (section) observer.observe(section)
     }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
-  useEffect(() => {
-    const sectionIds = nav.map(n => n.href.replace('#', ''))
-    const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[]
-    if (!sections.length) return
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActive('#' + entry.target.id)
-          }
-        })
-      },
-      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 1] }
-    )
-    sections.forEach(sec => observer.observe(sec))
     return () => observer.disconnect()
-  }, [])
+  }, [isHome])
 
-  const navClick = () => {
-    autoScroll.current = true
-    setHidden(false)
-  }
+  const hrefFor = (hash: string) => isHome ? hash : '/' + hash
 
   return (
-    <header className={`border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`}>
-      <div className="grid h-16 grid-cols-[1fr_auto_1fr] items-center px-4 md:px-6">
-        <Link href="#hero" onClick={navClick} className="flex items-center gap-2.5 font-bold tracking-tight text-lg">
-          <img src={favicon.src} alt="EAL Robotik" className="h-6 w-6 rounded-[4px] object-contain" />
-          <span className="gradient-text">Girls of Innovation</span>
+    <header className="site-header" onKeyDown={event => {
+      if (event.key === 'Escape' && menuOpen) {
+        setMenuOpen(false)
+        menuButton.current?.focus()
+      }
+    }}>
+      <div className="site-shell header-inner">
+        <Link href={hrefFor('#hero')} className="site-brand" onClick={() => setMenuOpen(false)}>
+          <img src="/logo.png" width={36} height={36} alt="" />
+          <span>Girls of Innovation</span>
         </Link>
-        <nav className="hidden md:flex gap-6 text-sm">
-          {nav.map(item => {
-            const isActive = active === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={navClick}
-                className={`relative transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                {item.label}
-                {isActive && (
-                  <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded bg-highlight" />
-                )}
-              </Link>
-            )
-          })}
+
+        <nav className="header-nav" aria-label="Main navigation">
+          {nav.map(item => (
+            <Link
+              key={item.href}
+              href={hrefFor(item.href)}
+              aria-current={isHome && active === item.href ? 'location' : undefined}
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
-        <div className="flex items-center justify-end gap-2">
-          <ThemeToggle />
-        </div>
+
+        <button
+          ref={menuButton}
+          type="button"
+          className="menu-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="mobile-navigation"
+          onClick={() => setMenuOpen(open => !open)}
+        >
+          {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          <span>{menuOpen ? 'Close' : 'Menu'}</span>
+        </button>
       </div>
+
+      <nav id="mobile-navigation" className="mobile-nav" aria-label="Mobile navigation" hidden={!menuOpen}>
+        <ul className="site-shell">
+          {nav.map(item => (
+            <li key={item.href}>
+              <Link href={hrefFor(item.href)} onClick={() => setMenuOpen(false)}>
+                {item.label} <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   )
 }

@@ -1,112 +1,39 @@
-"use client"
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { timelinePhotos } from '@/data/timeline-photos'
-import { preloadSingleImage } from '@/lib/image-preloader'
-
 const milestones = [
-  { year: 2021, title: 'Kuruluş', desc: '23 öğrenci ve 3 mentor ile takım kuruldu.' },
-  { year: 2022, title: 'İlk Sezon', desc: 'Çaylak yılda play-off çeyrek final başarısı.' },
-  { year: 2023, title: 'Güvenilirlik', desc: 'Orta üst sıralama ve destek rol optimizasyonu.' },
-  { year: 2025, title: 'Stratejik Seçim', desc: 'Daha düşük sıralamaya rağmen erken ittifak seçimi.' },
-  { year: 2026, title: 'Kilit Oyuncu', desc: "21. sıradan 5. ittifakın ilk tercihi olarak play-off'a geçiş." }
+  { year: '2019', title: 'Kulübün kuruluşu', description: 'Eskişehir Anadolu Lisesi Robotik Kulübü kuruldu; ilk yılında eğitimlere ve atölye altyapısına odaklandı.' },
+  { year: '2020', title: 'TEKNOFEST ile ilk başarı', description: 'VITECH, İnsanlık Yararına Teknolojiler Yarışması’nda Türkiye 13.sü oldu.' },
+  { year: '2021', title: 'Yeni takımlar, yeni alanlar', description: 'VITECH ve EAL.ino, İnsanlık Yararına Teknolojiler’de sırasıyla Türkiye 18.si ve 21.si oldu. Gökdoğan, Liseler Arası İHA Yarışması’nda finale kaldı.', image: '/timeline/2021/649590704_18083905697460203_2252134629097400636_n.webp' },
+  { year: '2022', title: 'Gökdoğan ilk onda', description: 'Gökdoğan, TEKNOFEST Liseler Arası İHA Yarışması’nda Türkiye 10.su oldu.' },
+  { year: '2023', title: 'İHA Performans Ödülü', description: 'Gökdoğan, TEKNOFEST Liseler Arası İHA Yarışması’nda Performans Ödülü aldı. İnsanlık yararına teknoloji projeleri için de raporlar hazırlandı.' },
+  { year: '2024', title: 'Fikirden proje raporuna', description: 'Gökdoğan için yangın gözlem ve müdahale tasarımı; Akıllı Saksı, BebekDuyu ve Güvenli Nefes için proje açıklamaları hazırlandı.' },
+  { year: '2025', title: 'Yeni fikirler ve bilim fuarları', description: 'SmartPark, SafePlug, EcoWarm, AutoScale ve deniz taşıtı için ön değerlendirme taslakları hazırlandı. Üyelerimiz TÜBİTAK 4006 projelerinde ve Gençtek etkinliklerinde yer aldı.' },
+  { year: '2026', title: 'MEB robot yarışmaları', description: '18. Uluslararası MEB Robot Yarışması’na katıldık. TEKNOFEST RoboLig için de bir mobil robot tasarım çalışması hazırladık.' }
 ]
-
-function YearPhotos({ year, photos, itemIndex }: { year: number; photos: string[]; itemIndex: number }) {
-  const [idx, setIdx] = useState(0)
-  const count = photos.length
-
-  useEffect(() => {
-    if (count <= 1) return
-
-    // sonraki gorselleri hemen hazirlayalim
-    preloadSingleImage(photos[(idx + 1) % count])
-    preloadSingleImage(photos[(idx + 2) % count])
-  }, [idx, photos, count])
-
-  useEffect(() => {
-    if (count <= 1) return
-
-    let interval: NodeJS.Timeout
-    const delay = itemIndex * 300
-    const timeout = setTimeout(() => {
-      setIdx((prev) => (prev + 1) % count)
-      interval = setInterval(() => {
-        setIdx((prev) => (prev + 1) % count)
-      }, 2000)
-    }, 2000 + delay)
-
-    return () => {
-      clearTimeout(timeout)
-      if (interval) clearInterval(interval)
-    }
-  }, [count, itemIndex])
-
-  if (!count) {
-    return (
-      <div className="aspect-[4/3] rounded-xl border border-dashed border-muted-foreground/40 bg-muted/10" />
-    )
-  }
-  return (
-    <div className="relative aspect-[4/3] rounded-xl overflow-hidden border border-border bg-muted/20">
-      <AnimatePresence>
-        <motion.img
-          key={photos[idx]}
-          src={photos[idx]}
-          alt={`${year} fotoğraf ${idx + 1}`}
-          loading="eager"
-          decoding="async"
-          onError={() => {
-            if (count > 1) {
-              setIdx((prev) => (prev + 1) % count)
-            }
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-          className="absolute inset-0 h-full w-full object-contain"
-        />
-      </AnimatePresence>
-    </div>
-  )
-}
 
 export function Timeline() {
   return (
-    <div className="relative">
-      <div className="absolute left-2 md:left-1/2 md:-ml-px top-0 bottom-0 w-px bg-gradient-to-b from-highlight/60 via-border to-highlight/40" />
-      <ul className="space-y-8 md:space-y-10 md:pt-32">
-        {milestones.map((m, i) => {
-          const left = i % 2 === 0
-          const textSide = left ? 'md:row-start-1 md:col-start-1 md:pr-12 md:text-right' : 'md:row-start-1 md:col-start-2 md:pl-12'
-          const photoSide = left ? 'md:row-start-1 md:col-start-2 md:pl-12' : 'md:row-start-1 md:col-start-1 md:pr-12'
-          const photos = timelinePhotos[String(m.year)] ?? []
-          return (
-            <motion.li
-              key={m.year}
-              initial={{ opacity: 0, x: left ? -20 : 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true, margin: '-40px' }}
-              transition={{ delay: i * 0.08, duration: 0.5 }}
-              className="relative md:grid md:grid-cols-2"
-            >
-              <div className="absolute left-2 md:left-1/2 md:-ml-2 top-1.5 md:top-1/2 md:-translate-y-1/2 w-4 h-4 rounded-full bg-gradient-to-tr from-primary to-highlight shadow ring-2 ring-background" />
-              <div className={`pl-8 md:pl-0 ${textSide} md:flex md:flex-col`}>
-                <div className="hidden md:block flex-1" />
-                <div className="text-sm text-highlight font-medium">{m.year}</div>
-                <div className="flex-1 md:pt-2">
-                  <h3 className="font-semibold leading-tight">{m.title}</h3>
-                  <p className={`text-sm text-muted-foreground mt-1 max-w-prose ${left ? 'md:ml-auto' : ''}`}>{m.desc}</p>
-                </div>
-              </div>
-              <div className={`mt-6 pl-8 md:pl-0 md:mt-0 ${photoSide} md:flex md:flex-col md:justify-center`}>
-                <YearPhotos year={m.year} photos={photos} itemIndex={i} />
-              </div>
-            </motion.li>
-          )
-        })}
-      </ul>
+    <div className="timeline">
+      <ol>
+        {milestones.map((milestone) => (
+          <li key={milestone.year}>
+            <time dateTime={milestone.year} className="technical-label"><span className="registration-mark" aria-hidden="true" />{milestone.year}</time>
+            <div>
+              <h4>{milestone.title}</h4>
+              <p>{milestone.description}</p>
+              {milestone.image && (
+                <img src={milestone.image} alt="2021 yılında TEKNOFEST’te EAL Robotik ekibi" loading="lazy" />
+              )}
+            </div>
+          </li>
+        ))}
+      </ol>
+      <aside className="timeline-aside">
+        <div>
+          <p className="technical-label accent-text">2022–2026 arşiv notu</p>
+          <h4>FRC yolculuğumuz</h4>
+          <p>8828 numaralı takımımız 2022, 2023, 2025 ve 2026 sezonlarında FIRST Robotics Competition’a katıldı. 2022 İzmir Regional’da Quality Award kazandı.</p>
+        </div>
+        <img src="/timeline/2022/8828 (1).webp" alt="EAL Robotik 2022 İzmir Regional takım fotoğrafı" loading="lazy" />
+      </aside>
     </div>
   )
 }

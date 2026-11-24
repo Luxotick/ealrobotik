@@ -1,100 +1,100 @@
-"use client"
+'use client'
+
 import Link from 'next/link'
-import { ThemeToggle } from '@/components/theme-toggle'
+import { usePathname } from 'next/navigation'
+import { ArrowUpRight, Menu, X } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 
-interface NavItem {
-  href: `#${string}`
-  label: string
-}
-
-const nav: readonly NavItem[] = [
-  { href: '#hero', label: 'Ana Sayfa' },
+const nav = [
+  { href: '#hero', label: 'Ana sayfa' },
   { href: '#hakkinda', label: 'Hakkında' },
-  { href: '#performans', label: 'Performans' },
-  { href: '#ekosistem', label: 'Ekosistem & Destek' },
+  { href: '#performans', label: 'Yarışmalar' },
+  { href: '#projeler', label: 'Projeler' },
+  { href: '#ekosistem', label: 'Destek' },
   { href: '#kaynaklar', label: 'Kaynaklar' },
   { href: '#egitimler', label: 'Eğitimler' },
-  { href: '#sosyal', label: 'Sosyal Sorumluluk' },
-  { href: '#iletisim', label: 'İletişim' }
+  { href: '#sosyal', label: 'Sosyal sorumluluk' },
+  { href: '#iletisim', label: 'İletişim' },
 ] as const
 
+type SectionHash = (typeof nav)[number]['href']
+
 export function SiteHeader() {
-  const [active, setActive] = useState<`#${string}`>('#hero')
-  const [hidden, setHidden] = useState(false)
-  const lastY = useRef(0)
-  const autoScroll = useRef(false)
+  const isHome = usePathname() === '/'
+  const [active, setActive] = useState<SectionHash>('#hero')
+  const [menuOpen, setMenuOpen] = useState(false)
+  const menuButton = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY
-      const dy = y - lastY.current
-      lastY.current = y
-      if (autoScroll.current) {
-        setHidden(false)
-        if (Math.abs(dy) < 2) autoScroll.current = false
-        return
-      }
-      if (y < 300) {
-        setHidden(false)
-        return
-      }
-      if (dy < -5) setHidden(false)
-      else if (dy > 5) setHidden(true)
+    if (!isHome) return
+
+    const observer = new IntersectionObserver(entries => {
+      const section = entries.find(entry => entry.isIntersecting)
+      if (section) setActive(`#${section.target.id}` as SectionHash)
+    }, { rootMargin: '-20% 0px -65% 0px' })
+
+    for (const item of nav) {
+      const section = document.getElementById(item.href.slice(1))
+      if (section) observer.observe(section)
     }
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
 
-  const navClick = () => {
-    autoScroll.current = true
-    setHidden(false)
-  }
-
-  useEffect(() => {
-  const sectionIds = nav.map(n => n.href.replace('#',''))
-    const sections = sectionIds.map(id => document.getElementById(id)).filter(Boolean) as HTMLElement[]
-    if (!sections.length) return
-    const observer = new IntersectionObserver(
-      entries => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            setActive(('#' + entry.target.id) as `#${string}`)
-          }
-        })
-      },
-      { rootMargin: '-40% 0px -50% 0px', threshold: [0, 0.25, 0.5, 1] }
-    )
-    sections.forEach(sec => observer.observe(sec))
     return () => observer.disconnect()
-  }, [])
+  }, [isHome])
+
+  const hrefFor = (hash: SectionHash) => isHome ? hash : `/${hash}`
+  const closeMenu = () => setMenuOpen(false)
 
   return (
-    <header className={`border-b bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40 transition-transform duration-300 ${hidden ? '-translate-y-full' : 'translate-y-0'}`}>
-      <div className="container h-16 flex items-center justify-between">
-        <Link href="#hero" onClick={navClick} className="font-bold tracking-tight text-lg">EAL Robotik 8828</Link>
-        <nav className="hidden md:flex gap-6 text-sm">
-          {nav.map(item => {
-            const isActive = active === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                onClick={navClick}
-                className={`relative transition-colors ${isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                {item.label}
-                {isActive && (
-                  <span className="absolute -bottom-1 left-0 h-[2px] w-full rounded bg-highlight" />
-                )}
-              </Link>
-            )
-          })}
+    <header className="site-header" onKeyDown={event => {
+      if (event.key === 'Escape' && menuOpen) {
+        closeMenu()
+        menuButton.current?.focus()
+      }
+    }}>
+      <div className="site-shell header-inner">
+        <Link href={hrefFor('#hero')} onClick={closeMenu} className="site-brand" aria-label="EAL Robotik ana sayfa">
+          <img src="/ealrobotik.png" width={36} height={36} alt="" />
+          <span>EAL Robotik</span>
+        </Link>
+
+        <nav className="header-nav" aria-label="Ana menü">
+          {nav.slice(1, -1).map(item => (
+            <Link key={item.href} href={hrefFor(item.href)} aria-current={isHome && active === item.href ? 'location' : undefined}>
+              {item.label}
+            </Link>
+          ))}
         </nav>
-        <div className="flex items-center gap-2">
-          <ThemeToggle />
+
+        <div className="header-actions">
+          <Link href={hrefFor('#iletisim')} className="site-button site-button-secondary header-contact" aria-current={isHome && active === '#iletisim' ? 'location' : undefined}>
+            İletişim <ArrowUpRight aria-hidden="true" />
+          </Link>
+          <button
+            ref={menuButton}
+            type="button"
+            className="site-icon-button header-menu-toggle"
+            aria-label={menuOpen ? 'Menüyü kapat' : 'Menüyü aç'}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-navigation"
+            onClick={() => setMenuOpen(open => !open)}
+          >
+            {menuOpen ? <X aria-hidden="true" /> : <Menu aria-hidden="true" />}
+          </button>
         </div>
       </div>
+
+      <nav id="mobile-navigation" className="mobile-nav" aria-label="Mobil menü" hidden={!menuOpen}>
+        <ul className="site-shell">
+          {nav.map(item => (
+            <li key={item.href}>
+              <Link href={hrefFor(item.href)} onClick={closeMenu} aria-current={isHome && active === item.href ? 'location' : undefined}>
+                {item.label}
+                <ArrowUpRight aria-hidden="true" />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
     </header>
   )
 }

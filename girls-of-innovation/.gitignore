@@ -1,6 +1,8 @@
 node_modules
 .next
 out
+public/gallery
 .DS_Store
 .env.local
 *.tsbuildinfo
+.tokensave

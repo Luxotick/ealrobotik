@@ -1,20 +1,16 @@
+import { ArrowUpRight } from 'lucide-react'
+import { contact } from '@/data/girls'
+
 const YEAR = 2026
 
 export function SiteFooter() {
   return (
-    <footer className="border-t mt-16 py-8 text-sm text-muted-foreground">
-      <div className="flex flex-col md:flex-row gap-4 items-center justify-between px-4 md:px-6">
-        <p>Girls of Innovation • EAL Robotik 8828 • Eskişehir Anadolu Lisesi • {YEAR}</p>
-        <p className="text-xs text-center">
-          <a
-            href="https://ealrobotik.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:underline underline-offset-4"
-          >
-            Made as part of EAL Robotik
-          </a>
-        </p>
+    <footer className="site-footer">
+      <div className="site-shell footer-inner">
+        <p><strong>Girls of Innovation</strong> <span>{contact.school} · {YEAR}</span></p>
+        <a className="text-link" href={contact.mainSite} target="_blank" rel="noopener noreferrer">
+          An EAL Robotik initiative <ArrowUpRight aria-hidden="true" />
+        </a>
       </div>
     </footer>
   )

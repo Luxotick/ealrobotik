@@ -1,10 +1,9 @@
 import './globals.css'
 import type { Metadata, Viewport } from 'next'
 import { ReactNode } from 'react'
+import { SiteBackground } from '@/components/site-background'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { ThemeProvider } from '@/components/theme-provider'
-import favicon from '../assets/favicon.ico'
 
 const siteUrl = 'https://girls.ealrobotik.com'
 const siteTitle = 'Girls of Innovation | EAL Robotik'
@@ -69,14 +68,14 @@ export const metadata: Metadata = {
     description: siteDescription,
     images: [logoUrl]
   },
-  icons: { icon: favicon.src, apple: favicon.src }
+  icons: { icon: '/logo.png', apple: '/logo.png' }
 }
 
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false
+  colorScheme: 'dark',
+  themeColor: '#160f18'
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -109,16 +108,16 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       </head>
-      <body className="min-h-screen flex flex-col font-sans antialiased">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <SiteHeader />
-          <main className="flex-1 container py-8">{children}</main>
-          <SiteFooter />
-        </ThemeProvider>
+      <body>
+        <SiteBackground />
+        <a className="skip-link" href="#content">Skip to content</a>
+        <SiteHeader />
+        <main id="content" className="site-shell site-main" tabIndex={-1}>{children}</main>
+        <SiteFooter />
       </body>
     </html>
   )

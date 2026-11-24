@@ -8,7 +8,7 @@ import { Contact } from '@/components/sections/contact'
 
 export default function GirlsPage() {
   return (
-    <div className="space-y-28">
+    <>
       <Hero />
       <About />
       <BarrierBreaker />
@@ -16,6 +16,6 @@ export default function GirlsPage() {
       <Impact />
       <Gallery />
       <Contact />
-    </div>
+    </>
   )
 }

@@ -1,19 +1,19 @@
 import './globals.css'
+import './site.css'
 import type { Metadata, Viewport } from 'next'
 import { ReactNode } from 'react'
+import { SiteBackground } from '@/components/site-background'
 import { SiteHeader } from '@/components/site-header'
 import { SiteFooter } from '@/components/site-footer'
-import { ThemeProvider } from '@/components/theme-provider'
-import { ImagePreloader } from '@/components/image-preloader'
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://ealrobotik.com'),
   title: {
-    default: 'EAL Robotik | FRC Team 8828',
+    default: 'EAL Robotik | Eskişehir Anadolu Lisesi Robotik Kulübü',
     template: '%s | EAL Robotik'
   },
-  description: 'Eskişehir Anadolu Lisesi FRC Takımı 8828. STEM, rekabetçi robotik, toplumsal etki ve genç mühendislik topluluğu. FIRST Robotics Competition takımı.',
-  keywords: ['FRC', 'FRC 8828', 'EAL Robotik', 'FIRST Robotics Competition', 'Eskişehir Anadolu Lisesi', 'robotik takımı', 'STEM', 'robotik', 'Eskişehir robotik'],
+  description: 'EAL Robotik, MEB robot yarışmalarına katılan, TEKNOFEST ve STEM projeleri geliştiren Eskişehir Anadolu Lisesi öğrenci kulübüdür.',
+  keywords: ['EAL Robotik', 'Eskişehir Anadolu Lisesi', 'MEB robot yarışması', 'TEKNOFEST', 'robotik kulübü', 'STEM', 'Eskişehir robotik'],
   applicationName: 'EAL Robotik',
   authors: [{ name: 'EAL Robotik', url: 'https://ealrobotik.com' }],
   creator: 'EAL Robotik',
@@ -35,8 +35,8 @@ export const metadata: Metadata = {
     locale: 'tr_TR',
     url: '/',
     siteName: 'EAL Robotik',
-    title: 'EAL Robotik | FRC Team 8828',
-    description: 'Eskişehir Anadolu Lisesi FRC Takımı 8828. STEM, rekabetçi robotik ve toplumsal etki.',
+    title: 'EAL Robotik | Eskişehir Anadolu Lisesi Robotik Kulübü',
+    description: 'MEB robot yarışmaları, TEKNOFEST, öğrenci projeleri ve STEM eğitimiyle EAL Robotik.',
     images: [
       {
         url: '/ealrobotik.png',
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'EAL Robotik | FRC Team 8828',
-    description: 'Eskişehir Anadolu Lisesi FRC Takımı 8828. STEM, rekabetçi robotik ve toplumsal etki.',
+    title: 'EAL Robotik | Eskişehir Anadolu Lisesi Robotik Kulübü',
+    description: 'MEB robot yarışmaları, TEKNOFEST, öğrenci projeleri ve STEM eğitimiyle EAL Robotik.',
     images: ['/ealrobotik.png']
   },
   icons: { icon: '/favicon.ico', apple: '/favicon.ico' }
@@ -58,13 +58,13 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  maximumScale: 1,
-  userScalable: false
+  colorScheme: 'dark',
+  themeColor: '#020817'
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="tr" suppressHydrationWarning>
+    <html lang="tr">
       <body className="min-h-screen flex flex-col font-sans antialiased">
         <script
           type="application/ld+json"
@@ -88,12 +88,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             })
           }}
         />
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <ImagePreloader />
-          <SiteHeader />
-          <main className="flex-1 container py-8">{children}</main>
-          <SiteFooter />
-        </ThemeProvider>
+        <SiteBackground />
+        <a className="site-skip-link" href="#icerik">İçeriğe geç</a>
+        <SiteHeader />
+        <main id="icerik" className="site-shell site-main" tabIndex={-1}>{children}</main>
+        <SiteFooter />
       </body>
     </html>
   )

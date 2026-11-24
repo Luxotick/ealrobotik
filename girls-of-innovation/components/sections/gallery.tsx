@@ -1,59 +1,28 @@
-'use client'
-import { useEffect } from 'react'
-import { motion } from 'framer-motion'
 import { SectionHeading } from '@/components/ui/section-heading'
 import { galleryPhotos } from '@/data/gallery'
 
+const sizes = '(min-width: 1360px) 304px, (min-width: 880px) 23vw, 46vw'
+
 export function Gallery() {
-  useEffect(() => {
-    let cancelled = false
-    const firstImage = new Image()
-
-    const preloadRemainingImages = () => {
-      if (cancelled) return
-
-      galleryPhotos.slice(1).forEach(src => {
-        const image = new Image()
-        image.src = src
-      })
-    }
-
-    firstImage.onload = preloadRemainingImages
-    firstImage.onerror = preloadRemainingImages
-    firstImage.src = galleryPhotos[0]
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
   return (
-    <section id="gallery" className="space-y-10 scroll-mt-24">
-      <SectionHeading
-        title="Moments from the movement"
-        subtitle="Workshops, conferences and events where girls take the stage in STEM."
-      />
-
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 max-w-6xl mx-auto">
-        {galleryPhotos.map((src, i) => (
-          <motion.div
-            key={src}
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-40px' }}
-            transition={{ delay: (i % 8) * 0.05, duration: 0.4 }}
-            className="relative aspect-square rounded-lg overflow-hidden border border-border bg-muted/20 group"
-          >
+    <section id="gallery" className="editorial-section">
+      <SectionHeading title="From the workshop" subtitle="Photos from our workshops, talks and events." />
+      <ul className="photo-grid" aria-label="Girls of Innovation event photos">
+        {galleryPhotos.map((photo, index) => (
+          <li key={photo.src}>
             <img
-              src={src}
-              alt={`Girls of Innovation event photo ${i + 1}`}
-              loading={i === 0 ? 'eager' : 'lazy'}
-              fetchPriority={i === 0 ? 'high' : 'auto'}
-              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+              src={photo.src}
+              srcSet={photo.srcSet}
+              sizes={sizes}
+              width={photo.width}
+              height={photo.height}
+              alt={'Girls of Innovation event photo ' + (index + 1)}
+              loading="lazy"
+              decoding="async"
             />
-          </motion.div>
+          </li>
         ))}
-      </div>
+      </ul>
     </section>
   )
 }

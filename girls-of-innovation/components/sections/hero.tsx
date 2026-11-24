@@ -1,56 +1,46 @@
-'use client'
-import { motion } from 'framer-motion'
-import { Button } from '@/components/ui/button'
-import { slogan, heroStats } from '@/data/girls'
+import { ArrowDown, ArrowRight } from 'lucide-react'
+import { heroStats } from '@/data/girls'
+import workshop from '../../assets/girls/_DSF1413.webp'
 
 export function Hero() {
   return (
-    <section id="hero" className="relative text-center space-y-10 py-10 md:py-16 scroll-mt-24">
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7, ease: 'easeOut' }}
-        className="text-4xl md:text-6xl font-bold tracking-tight leading-tight"
-      >
-        <span className="gradient-text">Girls of Innovation</span>
-      </motion.h1>
+    <section id="hero" className="hero" aria-labelledby="hero-title">
+      <div className="hero-intro">
+        <div>
+          <p className="technical-label hero-kicker">A project by EAL Robotik 8828</p>
+          <h1 id="hero-title">Girls of <span>Innovation</span></h1>
+        </div>
+        <div className="hero-summary">
+          <p>We help girls get hands-on with STEM through workshops, mentorship and leadership on our robotics team.</p>
+          <div className="hero-actions">
+            <a className="site-button primary-button" href="#barriers">Break a barrier <ArrowDown aria-hidden="true" /></a>
+            <a className="site-button secondary-button" href="#about">Our story <ArrowRight aria-hidden="true" /></a>
+          </div>
+        </div>
+      </div>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.15, duration: 0.6, ease: 'easeOut' }}
-        className="text-muted-foreground max-w-2xl mx-auto text-lg md:text-xl italic"
-      >
-        &ldquo;{slogan}&rdquo;
-      </motion.p>
+      <figure className="hero-figure">
+        <img
+          src={workshop.src}
+          width={workshop.width}
+          height={workshop.height}
+          alt="Four workshop participants showing the projects they made in the EAL Robotik lab"
+          fetchPriority="high"
+        />
+        <figcaption>
+          <span>In the workshop</span>
+          <span className="technical-label">Eskişehir, Türkiye</span>
+        </figcaption>
+      </figure>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.6, ease: 'easeOut' }}
-        className="flex gap-4 justify-center flex-wrap"
-      >
-        <Button href="#barriers" size="lg">
-          Break a Barrier
-        </Button>
-        <Button href="#about" size="lg" variant="outline">
-          Our Story
-        </Button>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.35, duration: 0.5 }}
-        className="flex flex-wrap gap-x-14 gap-y-6 justify-center"
-      >
-        {heroStats.map(s => (
-          <div key={s.label} className="text-center leading-tight">
-            <div className="font-semibold text-highlight text-sm md:text-base">{s.value}</div>
-            <div className="text-xs text-muted-foreground uppercase tracking-wide">{s.label}</div>
+      <dl className="hero-facts">
+        {heroStats.map(({ label, value }) => (
+          <div key={label}>
+            <dt>{label}</dt>
+            <dd>{value}</dd>
           </div>
         ))}
-      </motion.div>
+      </dl>
     </section>
   )
 }

@@ -1,30 +1,16 @@
-'use client'
-import { motion } from 'framer-motion'
 import { SectionHeading } from '@/components/ui/section-heading'
-import { impactNotes } from '@/data/girls'
+import { girlsShare, impactNotes } from '@/data/girls'
 
 export function Impact() {
   return (
-    <section id="impact" className="space-y-10 scroll-mt-24">
-      <SectionHeading
-        title="The change we are making"
-        subtitle="What breaking barriers looks like in practice, inside our team and beyond it."
-      />
-
-      <motion.p
-        initial={{ opacity: 0, y: 16 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-40px' }}
-        transition={{ duration: 0.6 }}
-        className="mx-auto max-w-3xl text-center text-base leading-loose text-muted-foreground md:text-lg"
-      >
-        {impactNotes.map((note, i) => (
-          <span key={i}>
-            {i > 0 && <span className="mx-3 text-highlight">&#183;</span>}
-            {note}
-          </span>
-        ))}
-      </motion.p>
+    <section id="impact" className="editorial-section">
+      <SectionHeading title="Our impact" subtitle="What has changed in our team and what we want to pass on." />
+      <div className="impact-layout">
+        <p className="impact-stat"><strong>{girlsShare}</strong> <span>of our robotics team are girls</span></p>
+        <ul className="impact-list">
+          {impactNotes.map(note => <li key={note}>{note}</li>)}
+        </ul>
+      </div>
     </section>
   )
 }
